@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Piano Tuner — Bộ Chỉnh Âm Đàn Piano</title>
+  <link rel="icon" href="data:,">
   <style>
     /* ==========================================================================
        1. THIẾT LẬP CƠ BẢN & PHONG CÁCH CELESTIAL / FANTASY (DESIGN SYSTEM)
@@ -1640,6 +1641,13 @@
 
         currentScene = targetScene;
 
+        // Quản lý vòng đời animation (chỉ chạy khi ở scene-generator, dừng hoàn toàn ở scene khác)
+        if (targetScene === 'generator') {
+          startWaveAnimation();
+        } else {
+          stopWaveAnimation();
+        }
+
         // Bước 3: Mở rèm
         setTimeout(() => {
           curtain.classList.remove('closed');
@@ -1786,6 +1794,8 @@
     let activeOsc = null;
     let activeGain = null;
     let isGenPlaying = false;
+    let isAudioStarting = false;
+    let userCancelledStart = false;
     let genFreq = 440.00;
     let genWave = 'sine';
     let genVolume = 0.12; // Mức an toàn mặc định (0.10 - 0.15)
@@ -1804,9 +1814,14 @@
     }
 
     async function startGenerator() {
-      if (isGenPlaying) return;
+      // Chống tạo trùng lặp oscillator khi đang chạy hoặc đang chờ AudioContext.resume()
+      if (isGenPlaying || isAudioStarting) return;
+      isAudioStarting = true;
+      userCancelledStart = false;
+
       const ctx = initAudioContext();
       if (!ctx) {
+        isAudioStarting = false;
         alert("Trình duyệt không hỗ trợ Web Audio API.");
         return;
       }
@@ -1817,10 +1832,27 @@
           await ctx.resume();
         }
 
+        // Nếu người dùng đã bấm Stop trong thời gian chờ resume
+        if (userCancelledStart) {
+          isAudioStarting = false;
+          return;
+        }
+
+        // Triệt để dọn dẹp các node cũ nếu còn tồn đọng trước khi khởi tạo
+        if (activeOsc) {
+          try { activeOsc.stop(); activeOsc.disconnect(); } catch (e) {}
+          activeOsc = null;
+        }
+        if (activeGain) {
+          try { activeGain.disconnect(); } catch (e) {}
+          activeGain = null;
+        }
+
         const now = ctx.currentTime;
 
         // Tạo GainNode với đường dốc 35ms (Anti-click/pop gain ramp)
         const gainNode = ctx.createGain();
+        gainNode.gain.cancelScheduledValues(now);
         gainNode.gain.setValueAtTime(0.0001, now);
         gainNode.gain.exponentialRampToValueAtTime(Math.max(0.0001, genVolume), now + 0.035);
         gainNode.connect(ctx.destination);
@@ -1836,23 +1868,34 @@
         activeOsc = osc;
         activeGain = gainNode;
         isGenPlaying = true;
+        isAudioStarting = false;
 
         updateGenStateUI();
       } catch (err) {
         console.error("Lỗi khởi tạo âm thanh:", err);
+        isAudioStarting = false;
         stopGenerator();
       }
     }
 
     function stopGenerator() {
-      if (!isGenPlaying && !activeOsc) return;
+      // Nếu thao tác Stop xảy ra khi đang chờ AudioContext.resume(), đánh dấu hủy
+      if (isAudioStarting) {
+        userCancelledStart = true;
+        isAudioStarting = false;
+      }
+
+      if (!isGenPlaying && !activeOsc) {
+        updateGenStateUI();
+        return;
+      }
       isGenPlaying = false;
 
       if (activeGain && audioCtx) {
         try {
           const now = audioCtx.currentTime;
-          // Hạ gain mượt mà trong 35ms để triệt tiêu tiếng bụp khi ngắt
           const currentVal = Math.max(0.0001, activeGain.gain.value);
+          activeGain.gain.cancelScheduledValues(now);
           activeGain.gain.setValueAtTime(currentVal, now);
           activeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
         } catch (e) {
@@ -2009,10 +2052,29 @@
       }
     }
 
+    // Quản lý vòng đời hoạt ảnh dạng sóng (Chỉ chạy khi đang ở scene-generator)
+    function startWaveAnimation() {
+      if (waveAnimId === null) {
+        waveAnimId = requestAnimationFrame(drawWaveformPreview);
+      }
+    }
+
+    function stopWaveAnimation() {
+      if (waveAnimId !== null) {
+        cancelAnimationFrame(waveAnimId);
+        waveAnimId = null;
+      }
+    }
+
     // Minh họa dạng sóng lý thuyết (Waveform Visualization)
     function drawWaveformPreview() {
+      if (currentScene !== 'generator') {
+        stopWaveAnimation();
+        return;
+      }
+
       const canvas = document.getElementById('genWaveCanvas');
-      if (canvas && currentScene === 'generator') {
+      if (canvas) {
         const ctx = canvas.getContext('2d');
         const w = canvas.width;
         const h = canvas.height;
@@ -2107,8 +2169,7 @@
       });
     });
 
-    // Bắt đầu vòng lặp render sóng
-    drawWaveformPreview();
+    // Animation vòng lặp chỉ khởi động theo nhu cầu khi chuyển vào scene-generator
 
     // Bắt đầu vòng lặp polling realtime ngay khi tải trang
     fetchRealtimeDSP();

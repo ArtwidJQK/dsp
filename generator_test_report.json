@@ -1,24 +1,82 @@
 {
-  "test1_title": "Piano Tuner \u2014 B\u1ed9 Ch\u1ec9nh \u00c2m \u0110\u00e0n Piano",
-  "test2_scenes": [
-    "scene-cover",
-    "scene-tuner",
-    "scene-info",
-    "scene-generator"
-  ],
-  "test3_errors": [],
-  "transition_to_generator": true,
-  "test4_freq_440": true,
-  "test5_play_stop": true,
-  "test6_freq_change_during_playback": true,
-  "test7_waveforms": true,
-  "test8_volume": true,
-  "test9_presets": true,
-  "test10_tuner_scene_works": true,
-  "test11_polling": {
-    "requests_in_500ms": 4,
+  "fix1_real_error_collection": {
+    "method": "CDP Runtime.exceptionThrown & Log.entryAdded",
+    "exception_count": 0,
+    "console_error_count": 0,
+    "exceptions": [],
+    "console_errors": [],
     "pass": true
   },
-  "test12_responsive": true,
-  "ALL_TESTS_PASSED": true
+  "fix3_animation_lifecycle": {
+    "initial_waveAnimId": null,
+    "generator_waveAnimId": 35,
+    "tuner_waveAnimId": null,
+    "reentry_waveAnimId": 98,
+    "pass": true
+  },
+  "fix4_audio_concurrency": {
+    "ctx_state": "running",
+    "no_orphaned_nodes": true,
+    "pass": true
+  },
+  "structural_audio_tests": {
+    "mode": "Muted Headless Structural Testing (AudioNode Graph)",
+    "audible_output_physically_measured": "NOT VERIFIED (Automation runs muted; requires physical checklist)",
+    "pass": true,
+    "waveforms": {
+      "sine": true,
+      "square": true,
+      "triangle": true
+    },
+    "presets": {
+      "A4": true,
+      "C4": true,
+      "C5": true,
+      "D3": true,
+      "E3": true,
+      "E2": true
+    }
+  },
+  "responsive_tests": {
+    "all_passed": true,
+    "details": {
+      "1920x1080": {
+        "label": "Desktop 1080p",
+        "card_width": 860,
+        "no_overflow": true,
+        "pass": true
+      },
+      "1366x768": {
+        "label": "Laptop 768p",
+        "card_width": 860,
+        "no_overflow": true,
+        "pass": true
+      },
+      "768x1024": {
+        "label": "Tablet Portrait",
+        "card_width": 706.6,
+        "no_overflow": true,
+        "pass": true
+      },
+      "412x915": {
+        "label": "Mobile (Pixel 7)",
+        "card_width": 384,
+        "no_overflow": true,
+        "pass": true
+      },
+      "390x844": {
+        "label": "Mobile (iPhone 14)",
+        "card_width": 362,
+        "no_overflow": true,
+        "pass": true
+      },
+      "360x800": {
+        "label": "Mobile (Small Galaxy 360px)",
+        "card_width": 332,
+        "no_overflow": true,
+        "pass": true
+      }
+    }
+  },
+  "ALL_VERIFICATION_TESTS_PASSED": true
 }

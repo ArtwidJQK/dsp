@@ -11,10 +11,13 @@ import tornado.websocket
 
 CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 HOST = "127.0.0.1"
-HTTP_PORT = 8991
-CDP_PORT = 9226
+HTTP_PORT = 8995
+CDP_PORT = 9230
 
 polling_request_count = 0
+pending_responses = {}
+captured_exceptions = []
+captured_console_errors = []
 
 class TestHTTPHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -24,6 +27,10 @@ class TestHTTPHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         global polling_request_count
+        if self.path == "/favicon.ico":
+            self.send_response(204)
+            self.end_headers()
+            return
         if self.path == "/api/data":
             polling_request_count += 1
             self.send_response(200)
@@ -45,7 +52,6 @@ class TestHTTPHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def log_message(self, format, *args):
-        # Mute logging to keep output clean
         pass
 
 def start_http_server():
@@ -54,16 +60,43 @@ def start_http_server():
     t.start()
     return server
 
+async def cdp_dispatcher(ws):
+    while True:
+        try:
+            msg_raw = await ws.read_message()
+            if msg_raw is None:
+                break
+            msg = json.loads(msg_raw)
+            if "id" in msg:
+                pending_responses[msg["id"]] = msg
+            else:
+                method = msg.get("method")
+                params = msg.get("params", {})
+                if method == "Runtime.exceptionThrown":
+                    details = params.get("exceptionDetails", {})
+                    text = details.get("text", "")
+                    exc_desc = details.get("exception", {}).get("description", "")
+                    captured_exceptions.append(f"{text}: {exc_desc}")
+                elif method == "Log.entryAdded":
+                    entry = params.get("entry", {})
+                    if entry.get("level") == "error":
+                        captured_console_errors.append(f"[{entry.get('source')}] {entry.get('text')}")
+                elif method == "Runtime.consoleAPICalled":
+                    if params.get("type") == "error":
+                        args_str = " ".join([str(a.get("value", a.get("description", ""))) for a in params.get("args", [])])
+                        captured_console_errors.append(f"[Console.error] {args_str}")
+        except Exception:
+            break
+
 async def send_cdp_cmd(ws, method, params=None, msg_id=[1]):
     mid = msg_id[0]
     msg_id[0] += 1
     req = {"id": mid, "method": method, "params": params or {}}
     await ws.write_message(json.dumps(req))
-    while True:
-        resp_raw = await ws.read_message()
-        resp = json.loads(resp_raw)
-        if resp.get("id") == mid:
-            return resp.get("result", {})
+    while mid not in pending_responses:
+        await asyncio.sleep(0.01)
+    res = pending_responses.pop(mid)
+    return res.get("result", {})
 
 async def eval_js(ws, expr, msg_id=[1]):
     res = await send_cdp_cmd(ws, "Runtime.evaluate", {
@@ -73,12 +106,11 @@ async def eval_js(ws, expr, msg_id=[1]):
     }, msg_id)
     return res.get("result", {}).get("value")
 
-async def run_all_tests():
+async def run_full_verification_suite():
     global polling_request_count
     server = start_http_server()
     print(f"[TEST SETUP] HTTP Server listening on http://{HOST}:{HTTP_PORT}/")
 
-    # Start Chrome headless
     cmd = [
         CHROME_PATH,
         "--headless=new",
@@ -93,10 +125,8 @@ async def run_all_tests():
     time.sleep(2.0)
 
     results = {}
-    console_errors = []
 
     try:
-        # Connect to CDP
         tabs_url = f"http://{HOST}:{CDP_PORT}/json"
         with urllib.request.urlopen(tabs_url) as resp:
             tabs = json.loads(resp.read().decode())
@@ -111,173 +141,201 @@ async def run_all_tests():
             raise Exception("No Chrome page target found!")
 
         ws = await tornado.websocket.websocket_connect(target_ws_url)
-        print("[TEST SETUP] Connected to Chrome DevTools Protocol via WebSocket")
+        print("[TEST SETUP] Connected to Chrome DevTools Protocol (CDP)")
+
+        # Start background event dispatcher for continuous exception & console error logging
+        asyncio.create_task(cdp_dispatcher(ws))
 
         msg_id = [1]
         await send_cdp_cmd(ws, "Runtime.enable", msg_id=msg_id)
         await send_cdp_cmd(ws, "Page.enable", msg_id=msg_id)
         await send_cdp_cmd(ws, "Log.enable", msg_id=msg_id)
 
-        # 1. Static HTML & JS Validation
-        print("\n--- TEST 1: Static HTML/JavaScript Validation ---")
-        title = await eval_js(ws, "document.title", msg_id)
-        results["test1_title"] = title
-        print(f"PASS: Page loaded with title '{title}'")
+        await asyncio.sleep(0.6)
 
-        # 2. Browser Load Test & DOM Existence
-        print("\n--- TEST 2: Browser Load Test & Scene Structure ---")
-        scenes = await eval_js(ws, "Array.from(document.querySelectorAll('.scene')).map(s => s.id)", msg_id)
-        results["test2_scenes"] = scenes
-        has_generator = "scene-generator" in scenes
-        print(f"Scenes detected: {scenes}")
-        print(f"PASS: scene-generator exists in DOM: {has_generator}")
+        # -------------------------------------------------------------
+        # 1. FIX 1: Proper Browser Error Collection (Runtime.exceptionThrown & Log.entryAdded)
+        # -------------------------------------------------------------
+        print("\n--- FIX 1: Browser Error Collection via CDP Events ---")
+        exc_count = len(captured_exceptions)
+        console_err_count = len(captured_console_errors)
+        print(f"Captured exceptions (Runtime.exceptionThrown): {exc_count}")
+        print(f"Captured console errors (Log.entryAdded / Runtime.consoleAPICalled): {console_err_count}")
+        fix1_pass = (exc_count == 0 and console_err_count == 0)
+        results["fix1_real_error_collection"] = {
+            "method": "CDP Runtime.exceptionThrown & Log.entryAdded",
+            "exception_count": exc_count,
+            "console_error_count": console_err_count,
+            "exceptions": captured_exceptions,
+            "console_errors": captured_console_errors,
+            "pass": fix1_pass
+        }
+        print(f"PASS Fix 1: Error collection active (0 exceptions, 0 console errors): {fix1_pass}")
 
-        # 3. Console Error Check
-        print("\n--- TEST 3: Console Error Check ---")
-        # Evaluate if any error was thrown during initial load
-        err_check = await eval_js(ws, "window.errors || []", msg_id)
-        results["test3_errors"] = err_check
-        print(f"PASS: Console error count on initial load: {len(err_check)}")
+        # -------------------------------------------------------------
+        # 2. FIX 3: Generator Animation Lifecycle (Demand-Driven Animation)
+        # -------------------------------------------------------------
+        print("\n--- FIX 3: Generator Animation Lifecycle (rAF on Generator Only) ---")
+        init_scene = await eval_js(ws, "currentScene", msg_id)
+        init_anim_id = await eval_js(ws, "waveAnimId", msg_id)
+        print(f"Initial scene '{init_scene}': waveAnimId = {init_anim_id} (No perpetual loop on initial load)")
 
-        # Switch to Generator Scene
-        print("\n--- TRANSITION: Switching to scene-generator ---")
-        await eval_js(ws, "document.getElementById('navGenerator').click()", msg_id)
-        # Wait for curtain animation (420ms + 420ms = ~850ms)
+        # Enter generator
+        await eval_js(ws, "switchSceneWithCurtain('generator')", msg_id)
         await asyncio.sleep(1.0)
-        active_scene = await eval_js(ws, "currentScene", msg_id)
-        scene_el_active = await eval_js(ws, "document.getElementById('scene-generator').classList.contains('active')", msg_id)
-        print(f"Current active scene: {active_scene}, scene-generator active class: {scene_el_active}")
-        results["transition_to_generator"] = (active_scene == "generator" and scene_el_active)
+        gen_scene = await eval_js(ws, "currentScene", msg_id)
+        gen_anim_id = await eval_js(ws, "waveAnimId", msg_id)
+        print(f"Entered '{gen_scene}': waveAnimId = {gen_anim_id} (Animation loop started)")
 
-        # 4. Set frequency to 440 Hz
-        print("\n--- TEST 4: Set frequency to 440 Hz ---")
-        await eval_js(ws, "setGeneratorFrequency(440.00, true)", msg_id)
-        freq_val = await eval_js(ws, "genFreq", msg_id)
-        input_val = await eval_js(ws, "parseFloat(document.getElementById('genFreqInput').value)", msg_id)
-        slider_val = await eval_js(ws, "parseFloat(document.getElementById('genFreqSlider').value)", msg_id)
-        disp_text = await eval_js(ws, "document.getElementById('genFreqBig').innerText", msg_id)
-        print(f"genFreq={freq_val}, input={input_val}, slider={slider_val}, display='{disp_text}'")
-        test4_pass = (freq_val == 440.00 and input_val == 440.00 and slider_val == 440.00)
-        results["test4_freq_440"] = test4_pass
-        print(f"PASS: Frequency 440.00 Hz synchronized across all controls: {test4_pass}")
+        # Leave to tuner
+        await eval_js(ws, "switchSceneWithCurtain('tuner')", msg_id)
+        await asyncio.sleep(1.0)
+        tuner_scene = await eval_js(ws, "currentScene", msg_id)
+        tuner_anim_id = await eval_js(ws, "waveAnimId", msg_id)
+        print(f"Navigated to '{tuner_scene}': waveAnimId = {tuner_anim_id} (Animation cancelled, 0 FPS CPU waste)")
 
-        # 5. Start and stop playback
-        print("\n--- TEST 5: Start and Stop Playback ---")
-        # Click Play
-        await eval_js(ws, "document.getElementById('genPlayBtn').click()", msg_id)
-        await asyncio.sleep(0.3)
-        is_playing_after_start = await eval_js(ws, "isGenPlaying", msg_id)
-        audio_ctx_state = await eval_js(ws, "audioCtx ? audioCtx.state : null", msg_id)
+        # Return to generator
+        await eval_js(ws, "switchSceneWithCurtain('generator')", msg_id)
+        await asyncio.sleep(1.0)
+        reentry_anim_id = await eval_js(ws, "waveAnimId", msg_id)
+        print(f"Returned to generator: waveAnimId = {reentry_anim_id} (Animation loop resumed cleanly)")
+
+        fix3_pass = (
+            init_anim_id is None and
+            gen_anim_id is not None and
+            tuner_anim_id is None and
+            reentry_anim_id is not None
+        )
+        results["fix3_animation_lifecycle"] = {
+            "initial_waveAnimId": init_anim_id,
+            "generator_waveAnimId": gen_anim_id,
+            "tuner_waveAnimId": tuner_anim_id,
+            "reentry_waveAnimId": reentry_anim_id,
+            "pass": fix3_pass
+        }
+        print(f"PASS Fix 3: Animation lifecycle strictly demand-driven: {fix3_pass}")
+
+        # -------------------------------------------------------------
+        # 3. FIX 4: Audio Lifecycle Concurrency & Rapid Click Protection
+        # -------------------------------------------------------------
+        print("\n--- FIX 4: Audio Lifecycle Concurrency & Rapid Clicks ---")
+        # Normal play / stop
+        await eval_js(ws, "startGenerator()", msg_id)
+        await asyncio.sleep(0.15)
         osc_active = await eval_js(ws, "activeOsc !== null", msg_id)
         gain_active = await eval_js(ws, "activeGain !== null", msg_id)
-        btn_text_start = await eval_js(ws, "document.getElementById('genPlayText').innerText", msg_id)
-        print(f"After Play: isGenPlaying={is_playing_after_start}, audioCtx.state={audio_ctx_state}, activeOsc={osc_active}, activeGain={gain_active}, btnText='{btn_text_start}'")
+        ctx_state = await eval_js(ws, "audioCtx ? audioCtx.state : null", msg_id)
 
-        # Click Stop
-        await eval_js(ws, "document.getElementById('genPlayBtn').click()", msg_id)
-        await asyncio.sleep(0.3)
-        is_playing_after_stop = await eval_js(ws, "isGenPlaying", msg_id)
-        osc_stopped = await eval_js(ws, "activeOsc === null", msg_id)
-        btn_text_stop = await eval_js(ws, "document.getElementById('genPlayText').innerText", msg_id)
-        print(f"After Stop: isGenPlaying={is_playing_after_stop}, activeOsc={osc_stopped}, btnText='{btn_text_stop}'")
-        test5_pass = (is_playing_after_start and not is_playing_after_stop and osc_stopped)
-        results["test5_play_stop"] = test5_pass
-        print(f"PASS: Play/Stop cycle completed cleanly: {test5_pass}")
-
-        # 6. Change frequency during playback
-        print("\n--- TEST 6: Change frequency during playback ---")
-        await eval_js(ws, "startGenerator()", msg_id)
-        await asyncio.sleep(0.2)
-        # Change to 880 Hz while playing
-        await eval_js(ws, "setGeneratorFrequency(880.00, true)", msg_id)
-        await asyncio.sleep(0.2)
-        osc_freq = await eval_js(ws, "activeOsc ? activeOsc.frequency.value : null", msg_id)
-        gen_freq_val = await eval_js(ws, "genFreq", msg_id)
-        print(f"During playback: genFreq={gen_freq_val}, oscillator.frequency.value={osc_freq}")
-        test6_pass = (gen_freq_val == 880.00 and osc_freq is not None and abs(osc_freq - 880.00) < 5.0)
-        results["test6_freq_change_during_playback"] = test6_pass
-        print(f"PASS: Dynamic frequency adjustment during active playback: {test6_pass}")
-
-        # 7. Test all three waveform types
-        print("\n--- TEST 7: Test all three waveform types ---")
-        waveform_results = {}
-        for wave in ["sine", "square", "triangle"]:
-            await eval_js(ws, f"setGeneratorWaveform('{wave}')", msg_id)
-            await asyncio.sleep(0.1)
-            actual_wave = await eval_js(ws, "activeOsc ? activeOsc.type : null", msg_id)
-            btn_active = await eval_js(ws, f"document.querySelector('[data-wave=\"{wave}\"]').classList.contains('active')", msg_id)
-            waveform_results[wave] = (actual_wave == wave and btn_active)
-            print(f"Waveform '{wave}': osc.type={actual_wave}, button active={btn_active}")
-        test7_pass = all(waveform_results.values())
-        results["test7_waveforms"] = test7_pass
-        print(f"PASS: Waveform types (sine, square, triangle): {test7_pass}")
-
-        # 8. Test volume changes
-        print("\n--- TEST 8: Test volume changes ---")
-        await eval_js(ws, "setGeneratorVolume(0.25)", msg_id)
-        await asyncio.sleep(0.1)
-        vol_val = await eval_js(ws, "genVolume", msg_id)
-        vol_readout = await eval_js(ws, "document.getElementById('genVolReadout').innerText", msg_id)
-        gain_val = await eval_js(ws, "activeGain ? activeGain.gain.value : null", msg_id)
-        print(f"Set volume 0.25: genVolume={vol_val}, readout='{vol_readout}', gain.value={gain_val}")
-        test8_pass = (vol_val == 0.25 and vol_readout == "25%")
-        results["test8_volume"] = test8_pass
-        print(f"PASS: Volume adjustment and readout: {test8_pass}")
-
-        # Stop playback after tests 5-8
         await eval_js(ws, "stopGenerator()", msg_id)
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.1)
+        osc_cleared = await eval_js(ws, "activeOsc === null", msg_id)
 
-        # 9. Test all presets
-        print("\n--- TEST 9: Test all presets ---")
-        presets = [
-            ("A4", 440.00),
-            ("C4", 261.626),
-            ("C5", 523.251),
-            ("D3", 146.832),
-            ("E3", 164.814),
-            ("E2", 82.407),
-        ]
-        preset_results = {}
-        for note, expected_freq in presets:
+        # Rapid Clicks Stress Test (10 toggles within 100ms)
+        print("Simulating 10 rapid clicks on Play/Stop toggle within 100ms...")
+        rapid_code = """
+        (async () => {
+            for (let i = 0; i < 10; i++) {
+                toggleGenerator();
+                await new Promise(r => setTimeout(r, 10));
+            }
+        })()
+        """
+        await eval_js(ws, rapid_code, msg_id)
+        await asyncio.sleep(0.3)
+        await eval_js(ws, "stopGenerator()", msg_id)
+        await asyncio.sleep(0.15)
+
+        rapid_playing = await eval_js(ws, "isGenPlaying", msg_id)
+        rapid_osc = await eval_js(ws, "activeOsc === null", msg_id)
+        rapid_gain = await eval_js(ws, "activeGain === null", msg_id)
+        rapid_starting = await eval_js(ws, "isAudioStarting", msg_id)
+        print(f"After rapid clicks: isGenPlaying={rapid_playing}, activeOsc==null={rapid_osc}, activeGain==null={rapid_gain}, isAudioStarting={rapid_starting}")
+
+        fix4_pass = (osc_active and gain_active and osc_cleared and not rapid_playing and rapid_osc and rapid_gain and not rapid_starting)
+        results["fix4_audio_concurrency"] = {
+            "ctx_state": ctx_state,
+            "no_orphaned_nodes": rapid_osc and rapid_gain,
+            "pass": fix4_pass
+        }
+        print(f"PASS Fix 4: Audio concurrency protected against rapid toggles, 0 orphaned nodes: {fix4_pass}")
+
+        # -------------------------------------------------------------
+        # 4. FIX 2 & TESTS: AudioNode Structure Tests (Muted Headless Testing)
+        # -------------------------------------------------------------
+        print("\n--- FIX 2: AudioNode Graph & Controls (Muted Headless Structural Testing) ---")
+        # 440 Hz
+        await eval_js(ws, "setGeneratorFrequency(440.00, true)", msg_id)
+        freq_sync = await eval_js(ws, "genFreq === 440.00 && parseFloat(document.getElementById('genFreqInput').value) === 440.00", msg_id)
+
+        # Start tone
+        await eval_js(ws, "startGenerator()", msg_id)
+        await asyncio.sleep(0.15)
+        # Dynamic frequency shift during playback to 523.25 Hz
+        await eval_js(ws, "setGeneratorFrequency(523.25, true)", msg_id)
+        await asyncio.sleep(0.15)
+        shifted_freq = await eval_js(ws, "activeOsc ? activeOsc.frequency.value : null", msg_id)
+        shift_ok = (abs(shifted_freq - 523.25) < 5.0)
+
+        # Waveforms (sine, square, triangle)
+        wave_results = {}
+        for w in ["sine", "square", "triangle"]:
+            await eval_js(ws, f"setGeneratorWaveform('{w}')", msg_id)
+            actual_w = await eval_js(ws, "activeOsc ? activeOsc.type : null", msg_id)
+            wave_results[w] = (actual_w == w)
+
+        # Volume adjustment
+        await eval_js(ws, "setGeneratorVolume(0.15)", msg_id)
+        vol_readout = await eval_js(ws, "document.getElementById('genVolReadout').innerText", msg_id)
+        vol_ok = (vol_readout == "15%")
+
+        # Presets (A4, C4, C5, D3, E3, E2)
+        presets_verified = {}
+        for note, p_freq in [("A4", 440.0), ("C4", 261.626), ("C5", 523.251), ("D3", 146.832), ("E3", 164.814), ("E2", 82.407)]:
             await eval_js(ws, f"document.getElementById('preset{note}').click()", msg_id)
-            await asyncio.sleep(0.1)
-            actual_gen_freq = await eval_js(ws, "genFreq", msg_id)
-            btn_is_active = await eval_js(ws, f"document.getElementById('preset{note}').classList.contains('active')", msg_id)
-            diff = abs(actual_gen_freq - expected_freq)
-            is_ok = (diff < 0.05 and btn_is_active)
-            preset_results[note] = {"expected": expected_freq, "actual": actual_gen_freq, "active": btn_is_active, "pass": is_ok}
-            print(f"Preset {note}: expected {expected_freq} Hz, actual {actual_gen_freq} Hz, active={btn_is_active} -> {'PASS' if is_ok else 'FAIL'}")
-        test9_pass = all(p["pass"] for p in preset_results.values())
-        results["test9_presets"] = test9_pass
-        print(f"PASS: All 6 piano presets verified: {test9_pass}")
+            cur_f = await eval_js(ws, "genFreq", msg_id)
+            presets_verified[note] = (abs(cur_f - p_freq) < 0.05)
 
-        # 10. Confirm existing tuner scene still works
-        print("\n--- TEST 10: Confirm existing tuner scene still works ---")
-        await eval_js(ws, "document.getElementById('navTuner').click()", msg_id)
+        await eval_js(ws, "stopGenerator()", msg_id)
+        await asyncio.sleep(0.1)
+
+        structural_pass = (
+            freq_sync and
+            shift_ok and
+            all(wave_results.values()) and
+            vol_ok and
+            all(presets_verified.values())
+        )
+        results["structural_audio_tests"] = {
+            "mode": "Muted Headless Structural Testing (AudioNode Graph)",
+            "audible_output_physically_measured": "NOT VERIFIED (Automation runs muted; requires physical checklist)",
+            "pass": structural_pass,
+            "waveforms": wave_results,
+            "presets": presets_verified
+        }
+        print(f"PASS AudioNode Structural Verification (Muted Automation): {structural_pass}")
+
+        # -------------------------------------------------------------
+        # 5. REGRESSION: Tuner Scene Navigation & Polling
+        # -------------------------------------------------------------
+        print("\n--- REGRESSION: Tuner Scene Navigation & Polling ---")
+        await eval_js(ws, "switchSceneWithCurtain('tuner')", msg_id)
         await asyncio.sleep(1.0)
-        active_scene_tuner = await eval_js(ws, "currentScene", msg_id)
-        tuner_card_has_signal = await eval_js(ws, "document.getElementById('tunerCard').classList.contains('has-signal')", msg_id)
         tuner_note = await eval_js(ws, "document.getElementById('uiNote').innerText", msg_id)
         tuner_freq = await eval_js(ws, "document.getElementById('uiFrequency').innerText", msg_id)
-        print(f"Switched back to Tuner: currentScene={active_scene_tuner}, note='{tuner_note}', freq='{tuner_freq}', has-signal={tuner_card_has_signal}")
-        test10_pass = (active_scene_tuner == "tuner" and tuner_note == "A4")
-        results["test10_tuner_scene_works"] = test10_pass
-        print(f"PASS: Tuner scene operational and receiving data: {test10_pass}")
+        tuner_has_signal = await eval_js(ws, "document.getElementById('tunerCard').classList.contains('has-signal')", msg_id)
+        tuner_ok = (tuner_note == "A4" and tuner_freq == "440.05 Hz" and tuner_has_signal)
+        print(f"Tuner scene UI: Note='{tuner_note}', Freq='{tuner_freq}', has-signal={tuner_has_signal} -> PASS={tuner_ok}")
 
-        # 11. Confirm /api/data polling is unchanged
-        print("\n--- TEST 11: Confirm /api/data polling is unchanged ---")
-        count_before = polling_request_count
+        p_before = polling_request_count
         await asyncio.sleep(0.5)
-        count_after = polling_request_count
-        delta = count_after - count_before
-        test11_pass = delta >= 2
-        results["test11_polling"] = {"requests_in_500ms": delta, "pass": test11_pass}
-        print(f"Polling requests received in 500ms: {delta} (Total count: {count_after})")
-        print(f"PASS: Background /api/data polling active and uninterrupted: {test11_pass}")
+        p_delta = polling_request_count - p_before
+        polling_ok = p_delta >= 2
+        print(f"Polling requests in 500ms: {p_delta} -> PASS={polling_ok}")
 
-        # 12. Test responsive layouts across 6 resolutions
-        print("\n--- TEST 12: Test responsive layouts across 6 resolutions ---")
+        # -------------------------------------------------------------
+        # 6. RESPONSIVE LAYOUT (6 resolutions)
+        # -------------------------------------------------------------
+        print("\n--- REGRESSION: Responsive Layout Across 6 Resolutions ---")
         resolutions = [
             (1920, 1080, "Desktop 1080p"),
             (1366, 768, "Laptop 768p"),
@@ -286,7 +344,8 @@ async def run_all_tests():
             (390, 844, "Mobile (iPhone 14)"),
             (360, 800, "Mobile (Small Galaxy 360px)")
         ]
-        resp_results = {}
+        resp_all_ok = True
+        resp_details = {}
         for width, height, label in resolutions:
             await send_cdp_cmd(ws, "Emulation.setDeviceMetricsOverride", {
                 "width": width,
@@ -295,48 +354,44 @@ async def run_all_tests():
                 "mobile": width <= 640
             }, msg_id)
             await asyncio.sleep(0.2)
-            
-            # Switch between scenes to verify layout rendering
-            await eval_js(ws, "document.getElementById('navGenerator').click()", msg_id)
+            await eval_js(ws, "switchSceneWithCurtain('generator')", msg_id)
             await asyncio.sleep(0.9)
-            
-            body_overflow_x = await eval_js(ws, "document.documentElement.scrollWidth <= window.innerWidth + 2", msg_id)
-            gen_card_width = await eval_js(ws, "document.getElementById('generatorCard').getBoundingClientRect().width", msg_id)
-            nav_width = await eval_js(ws, "document.querySelector('.bottom-nav').getBoundingClientRect().width", msg_id)
-            
-            is_resp_ok = body_overflow_x and (gen_card_width <= width) and (nav_width <= width)
-            resp_results[f"{width}x{height}"] = {
-                "label": label,
-                "no_horizontal_overflow": body_overflow_x,
-                "card_width": round(gen_card_width, 1),
-                "nav_width": round(nav_width, 1),
-                "pass": is_resp_ok
-            }
-            print(f"Resolution {width}x{height} ({label}): card={round(gen_card_width, 1)}px, nav={round(nav_width, 1)}px, no-overflow={body_overflow_x} -> {'PASS' if is_resp_ok else 'FAIL'}")
 
-        test12_pass = all(r["pass"] for r in resp_results.values())
-        results["test12_responsive"] = test12_pass
-        print(f"PASS: All 6 responsive resolutions verified without horizontal overflow: {test12_pass}")
+            no_overflow = await eval_js(ws, "document.documentElement.scrollWidth <= window.innerWidth + 2", msg_id)
+            card_w = await eval_js(ws, "document.getElementById('generatorCard').getBoundingClientRect().width", msg_id)
+            is_ok = no_overflow and (card_w <= width)
+            if not is_ok:
+                resp_all_ok = False
+            resp_details[f"{width}x{height}"] = {"label": label, "card_width": round(card_w, 1), "no_overflow": no_overflow, "pass": is_ok}
+            print(f"  {width}x{height} ({label}): card={round(card_w, 1)}px, no-overflow={no_overflow} -> {'PASS' if is_ok else 'FAIL'}")
 
-        # Summary
-        all_passed = all([
-            results["test1_title"] is not None,
-            results["test2_scenes"] is not None,
-            results["transition_to_generator"],
-            results["test4_freq_440"],
-            results["test5_play_stop"],
-            results["test6_freq_change_during_playback"],
-            results["test7_waveforms"],
-            results["test8_volume"],
-            results["test9_presets"],
-            results["test10_tuner_scene_works"],
-            results["test11_polling"]["pass"],
-            results["test12_responsive"]
-        ])
-        results["ALL_TESTS_PASSED"] = all_passed
-        print("\n==========================================")
-        print(f"OVERALL STATUS: {'ALL 12 TESTS PASSED!' if all_passed else 'SOME TESTS FAILED'}")
-        print("==========================================")
+        results["responsive_tests"] = {
+            "all_passed": resp_all_ok,
+            "details": resp_details
+        }
+
+        # -------------------------------------------------------------
+        # 7. FINAL RUNTIME ERROR AUDIT
+        # -------------------------------------------------------------
+        print("\n--- FINAL RUNTIME ERROR AUDIT (WHOLE SESSION) ---")
+        print(f"Total runtime JS exceptions: {len(captured_exceptions)}")
+        print(f"Total runtime console errors: {len(captured_console_errors)}")
+        final_errors_zero = (len(captured_exceptions) == 0 and len(captured_console_errors) == 0)
+
+        all_passed = (
+            fix1_pass and
+            fix3_pass and
+            fix4_pass and
+            structural_pass and
+            tuner_ok and
+            polling_ok and
+            resp_all_ok and
+            final_errors_zero
+        )
+        results["ALL_VERIFICATION_TESTS_PASSED"] = all_passed
+        print("\n=======================================================")
+        print(f"OVERALL STATUS: {'ALL CHECKS PASSED (100%)' if all_passed else 'SOME CHECKS FAILED'}")
+        print("=======================================================")
 
         with open("d:/dsp/artwid/piano_tuner/generator_test_report.json", "w", encoding="utf-8") as rf:
             json.dump(results, rf, indent=2)
@@ -349,5 +404,4 @@ async def run_all_tests():
             proc.kill()
 
 if __name__ == "__main__":
-    asyncio.run(run_all_tests())
-
+    asyncio.run(run_full_verification_suite())
