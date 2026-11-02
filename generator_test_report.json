@@ -1,0 +1,24 @@
+{
+  "test1_title": "Piano Tuner \u2014 B\u1ed9 Ch\u1ec9nh \u00c2m \u0110\u00e0n Piano",
+  "test2_scenes": [
+    "scene-cover",
+    "scene-tuner",
+    "scene-info",
+    "scene-generator"
+  ],
+  "test3_errors": [],
+  "transition_to_generator": true,
+  "test4_freq_440": true,
+  "test5_play_stop": true,
+  "test6_freq_change_during_playback": true,
+  "test7_waveforms": true,
+  "test8_volume": true,
+  "test9_presets": true,
+  "test10_tuner_scene_works": true,
+  "test11_polling": {
+    "requests_in_500ms": 4,
+    "pass": true
+  },
+  "test12_responsive": true,
+  "ALL_TESTS_PASSED": true
+}

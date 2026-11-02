@@ -763,6 +763,325 @@
 
     .curtain-left .curtain-ornament { right: clamp(15px, 4vw, 30px); }
     .curtain-right .curtain-ornament { left: clamp(15px, 4vw, 30px); }
+    /* ==========================================================================
+       10. SCENE 4: MÁY PHÁT TẦN SỐ (FREQUENCY GENERATOR)
+       ========================================================================== */
+    .gen-card {
+      width: 100%;
+      max-width: 860px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: clamp(20px, 3.5vw, 28px);
+      padding: clamp(20px, 3.5vh, 32px) clamp(16px, 4vw, 40px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(28, 18, 65, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(12px, 2vh, 18px);
+      position: relative;
+      transition: border-color 0.4s var(--ease-celestial), box-shadow 0.4s var(--ease-celestial);
+    }
+
+    .gen-card.is-playing {
+      border-color: rgba(77, 238, 234, 0.45);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(77, 238, 234, 0.22);
+    }
+
+    .gen-freq-display {
+      font-size: clamp(44px, 10vw, 76px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-shadow: 0 0 30px var(--gold-primary), 0 0 60px var(--gold-glow);
+      font-variant-numeric: tabular-nums;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .gen-unit {
+      font-size: clamp(18px, 3.5vw, 26px);
+      color: var(--cyan-celestial);
+      font-weight: 400;
+      text-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    .gen-state-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      background: rgba(14, 18, 40, 0.75);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: clamp(11.5px, 1.6vw, 13px);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .gen-wave-box {
+      width: 100%;
+      max-width: 640px;
+      background: rgba(10, 14, 30, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 8px 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.85);
+    }
+
+    .gen-wave-canvas {
+      width: 100%;
+      height: 56px;
+      display: block;
+    }
+
+    .gen-wave-note {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.8px;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .gen-control-row {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 2vw, 16px);
+      flex-wrap: wrap;
+    }
+
+    .gen-play-btn {
+      min-width: 180px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 28px;
+    }
+
+    .gen-play-btn.playing {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.4));
+      border-color: #f87171;
+      color: #fff;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.45), inset 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .gen-wave-selector {
+      display: flex;
+      background: rgba(14, 18, 40, 0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: 35px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .gen-wave-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: clamp(11.5px, 1.5vw, 13px);
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 8px clamp(8px, 1.5vw, 14px);
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-celestial);
+    }
+
+    .gen-wave-btn:hover {
+      color: #fff;
+    }
+
+    .gen-wave-btn.active {
+      color: var(--gold-primary);
+      background: rgba(255, 226, 138, 0.18);
+      box-shadow: 0 0 14px var(--gold-glow);
+    }
+
+    .gen-slider-group {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .gen-slider-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .gen-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(10, 14, 30, 0.85);
+      border: 1px solid rgba(255, 226, 138, 0.3);
+      border-radius: 8px;
+      padding: 4px 10px;
+      transition: border-color 0.25s ease;
+    }
+
+    .gen-input-wrap:focus-within {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    .gen-num-input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      width: 82px;
+      text-align: right;
+      outline: none;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .gen-num-input::-webkit-outer-spin-button,
+    .gen-num-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .gen-num-input {
+      -moz-appearance: textfield;
+    }
+
+    .input-suffix {
+      font-size: 13px;
+      color: var(--gold-primary);
+      font-weight: 500;
+    }
+
+    .gen-range-slider {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .gen-range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      box-shadow: 0 0 12px var(--gold-glow);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 2px solid #ffffff;
+    }
+
+    .gen-range-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 18px var(--gold-primary);
+    }
+
+    .gen-range-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      box-shadow: 0 0 12px var(--gold-glow);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+
+    .gen-presets-section {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .gen-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .preset-btn {
+      background: rgba(14, 18, 40, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-celestial);
+      color: var(--text-main);
+    }
+
+    .preset-btn strong {
+      font-size: 14.5px;
+      color: var(--gold-primary);
+      letter-spacing: 0.5px;
+    }
+
+    .preset-btn span {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--cyan-celestial);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 0 14px var(--cyan-glow);
+    }
+
+    .preset-btn.active {
+      border-color: var(--gold-primary);
+      background: rgba(255, 226, 138, 0.15);
+      box-shadow: 0 0 16px var(--gold-glow);
+    }
+
+    .gen-notice-box {
+      width: 100%;
+      max-width: 640px;
+      background: rgba(255, 226, 138, 0.06);
+      border: 1px dashed rgba(255, 226, 138, 0.28);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--text-dim);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .gen-notice-box .crest-icon {
+      color: var(--gold-primary);
+      font-size: 14px;
+      margin-top: 1px;
+    }
+
 
     /* ==========================================================================
        10. MEDIA QUERIES: TABLET, MOBILE PORTRAIT & MOBILE LANDSCAPE
@@ -824,21 +1143,48 @@
         font-size: 14.5px;
       }
 
+      .gen-card {
+        padding: 16px 12px;
+        gap: 12px;
+      }
+
+      .gen-play-btn {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .gen-wave-selector {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .gen-wave-btn {
+        flex: 1;
+        padding: 7px 4px;
+        font-size: 11px;
+        text-align: center;
+      }
+
+      .gen-presets-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
       .bottom-nav {
         width: 100%;
-        max-width: 420px;
+        max-width: 480px;
         justify-content: space-between;
-        padding: 4px 6px;
-        gap: 4px;
+        padding: 4px;
+        gap: 3px;
       }
 
       .nav-btn {
         flex: 1;
         justify-content: center;
-        padding: 8px 6px;
-        font-size: 12px;
-        letter-spacing: 0.5px;
-        min-height: 42px;
+        padding: 7px 2px;
+        font-size: 10.5px;
+        letter-spacing: 0.2px;
+        min-height: 40px;
       }
 
       .nav-btn span:first-child {
@@ -1135,6 +1481,108 @@
         </div>
       </section>
 
+      <!-- ======================================================================
+           SCENE 4: FREQUENCY GENERATOR (MÁY PHÁT TẦN SỐ)
+           ====================================================================== -->
+      <section class="scene" id="scene-generator">
+        <div class="tuner-card gen-card" id="generatorCard">
+          <div class="tuner-header-title">MÁY PHÁT TẦN SỐ (FREQUENCY GENERATOR)</div>
+
+          <!-- Tần số hiển thị lớn & Trạng thái phát -->
+          <div class="note-spotlight">
+            <div class="gen-freq-display" id="genFreqBig">440.00 <span class="gen-unit">Hz</span></div>
+            <div class="gen-state-badge" id="genStatusBadge">
+              <span class="status-dot no-signal" id="genStatusDot"></span>
+              <span id="genStatusText">ĐANG DỪNG</span>
+            </div>
+          </div>
+
+          <!-- Minh họa dạng sóng lý thuyết (Oscillator Visualization) -->
+          <div class="gen-wave-box">
+            <canvas id="genWaveCanvas" width="600" height="65" class="gen-wave-canvas"></canvas>
+            <div class="gen-wave-note">Dạng sóng lý thuyết (Oscillator Type Visualization)</div>
+          </div>
+
+          <!-- Nút Bắt đầu / Dừng & Chọn Dạng sóng -->
+          <div class="gen-control-row">
+            <button class="btn-celestial-start gen-play-btn" id="genPlayBtn">
+              <span id="genPlayIcon">▶</span>
+              <span id="genPlayText">BẮT ĐẦU PHÁT</span>
+            </button>
+
+            <div class="gen-wave-selector">
+              <button class="gen-wave-btn active" data-wave="sine" id="waveSine" title="Sóng Sin">Sin (Sine)</button>
+              <button class="gen-wave-btn" data-wave="square" id="waveSquare" title="Sóng Vuông">Vuông (Square)</button>
+              <button class="gen-wave-btn" data-wave="triangle" id="waveTriangle" title="Sóng Tam Giác">Tam giác (Triangle)</button>
+            </div>
+          </div>
+
+          <!-- Điều khiển tần số: Ô nhập số & Thanh trượt -->
+          <div class="gen-slider-group">
+            <div class="gen-slider-header">
+              <span class="stat-label">Tần số (20.00 – 2000.00 Hz)</span>
+              <div class="gen-input-wrap">
+                <input type="number" id="genFreqInput" class="gen-num-input" min="20" max="2000" step="0.01" value="440.00" aria-label="Tần số">
+                <span class="input-suffix">Hz</span>
+              </div>
+            </div>
+            <input type="range" id="genFreqSlider" class="gen-range-slider" min="20" max="2000" step="0.1" value="440" aria-label="Thanh trượt tần số">
+            <div class="meter-labels">
+              <span>20 Hz</span>
+              <span>440 Hz</span>
+              <span>1000 Hz</span>
+              <span>2000 Hz</span>
+            </div>
+          </div>
+
+          <!-- Âm lượng (Volume) -->
+          <div class="gen-slider-group">
+            <div class="gen-slider-header">
+              <span class="stat-label">Âm lượng (Volume)</span>
+              <span class="stat-value" id="genVolReadout" style="font-size: 15px;">12%</span>
+            </div>
+            <input type="range" id="genVolumeSlider" class="gen-range-slider" min="0" max="1" step="0.01" value="0.12" aria-label="Thanh trượt âm lượng">
+          </div>
+
+          <!-- Phím tắt tần số Piano (Presets) -->
+          <div class="gen-presets-section">
+            <div class="stat-label" style="text-align: center; margin-bottom: 8px;">Phím tắt tần số Piano (Presets)</div>
+            <div class="gen-presets-grid">
+              <button class="preset-btn active" data-freq="440.00" data-note="A4" id="presetA4">
+                <strong>A4</strong>
+                <span>440.00 Hz</span>
+              </button>
+              <button class="preset-btn" data-freq="261.626" data-note="C4" id="presetC4">
+                <strong>C4</strong>
+                <span>261.63 Hz</span>
+              </button>
+              <button class="preset-btn" data-freq="523.251" data-note="C5" id="presetC5">
+                <strong>C5</strong>
+                <span>523.25 Hz</span>
+              </button>
+              <button class="preset-btn" data-freq="146.832" data-note="D3" id="presetD3">
+                <strong>D3</strong>
+                <span>146.83 Hz</span>
+              </button>
+              <button class="preset-btn" data-freq="164.814" data-note="E3" id="presetE3">
+                <strong>E3</strong>
+                <span>164.81 Hz</span>
+              </button>
+              <button class="preset-btn" data-freq="82.407" data-note="E2" id="presetE2">
+                <strong>E2</strong>
+                <span>82.41 Hz</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Thông báo phát âm thanh qua Web Audio API -->
+          <div class="gen-notice-box">
+            <span class="crest-icon">✦</span>
+            <span>Lưu ý: Tín hiệu âm thanh được tạo trực tiếp từ Web Audio API của trình duyệt và phát qua loa/tai nghe của thiết bị bạn đang dùng. Microphone INMP441 trên ESP32 chỉ thu nhận tín hiệu khi âm thanh được phát thực tế trong không gian qua loa vật lý.</span>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <!-- THANH ĐIỀU HƯỚNG CỐ ĐỊNH PHÍA DƯỚI -->
@@ -1146,6 +1594,10 @@
       <button class="nav-btn" id="navTuner" data-scene="tuner">
         <span>🎹</span>
         <span>CHỈNH ÂM</span>
+      </button>
+      <button class="nav-btn" id="navGenerator" data-scene="generator">
+        <span>🔊</span>
+        <span>PHÁT ÂM</span>
       </button>
       <button class="nav-btn" id="navInfo" data-scene="info">
         <span>ℹ</span>
@@ -1202,13 +1654,14 @@
     // 2. GẮN SỰ KIỆN ĐIỀU HƯỚNG
     document.getElementById('navCover').addEventListener('click', () => switchSceneWithCurtain('cover'));
     document.getElementById('navTuner').addEventListener('click', () => switchSceneWithCurtain('tuner'));
+    document.getElementById('navGenerator').addEventListener('click', () => switchSceneWithCurtain('generator'));
     document.getElementById('navInfo').addEventListener('click', () => switchSceneWithCurtain('info'));
     document.getElementById('btnStartTuner').addEventListener('click', () => switchSceneWithCurtain('tuner'));
     document.getElementById('btnBackToTuner').addEventListener('click', () => switchSceneWithCurtain('tuner'));
 
-    // Gắn sự kiện các nút tiện ích (UI Shell: tương lai)
+    // Gắn sự kiện nút tiện ích Âm nhạc -> Mở ngay Máy phát tần số
     document.getElementById('btnMusic').addEventListener('click', () => {
-      alert('Chức năng Âm nhạc đang được chuẩn bị.');
+      switchSceneWithCurtain('generator');
     });
 
     document.getElementById('btnSettings').addEventListener('click', () => {
@@ -1325,6 +1778,337 @@
       estEl.textContent = 'LỖI MẠNG';
       if (cardEl) cardEl.classList.remove('has-signal');
     }
+
+    // ==========================================================================
+    // 4. WEB-BASED FREQUENCY GENERATOR (WEB AUDIO API MODULE)
+    // ==========================================================================
+    let audioCtx = null;
+    let activeOsc = null;
+    let activeGain = null;
+    let isGenPlaying = false;
+    let genFreq = 440.00;
+    let genWave = 'sine';
+    let genVolume = 0.12; // Mức an toàn mặc định (0.10 - 0.15)
+    let waveAnimId = null;
+    let wavePhase = 0;
+
+    // Khởi tạo AudioContext duy nhất theo chuẩn Web Audio API (sau cử chỉ người dùng)
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      return audioCtx;
+    }
+
+    async function startGenerator() {
+      if (isGenPlaying) return;
+      const ctx = initAudioContext();
+      if (!ctx) {
+        alert("Trình duyệt không hỗ trợ Web Audio API.");
+        return;
+      }
+
+      try {
+        // Tự động khôi phục AudioContext nếu bị trình duyệt suspend (Autoplay Policy)
+        if (ctx.state === 'suspended') {
+          await ctx.resume();
+        }
+
+        const now = ctx.currentTime;
+
+        // Tạo GainNode với đường dốc 35ms (Anti-click/pop gain ramp)
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(0.0001, now);
+        gainNode.gain.exponentialRampToValueAtTime(Math.max(0.0001, genVolume), now + 0.035);
+        gainNode.connect(ctx.destination);
+
+        // Tạo OscillatorNode
+        const osc = ctx.createOscillator();
+        osc.type = genWave;
+        osc.frequency.setValueAtTime(genFreq, now);
+        osc.connect(gainNode);
+
+        osc.start(now);
+
+        activeOsc = osc;
+        activeGain = gainNode;
+        isGenPlaying = true;
+
+        updateGenStateUI();
+      } catch (err) {
+        console.error("Lỗi khởi tạo âm thanh:", err);
+        stopGenerator();
+      }
+    }
+
+    function stopGenerator() {
+      if (!isGenPlaying && !activeOsc) return;
+      isGenPlaying = false;
+
+      if (activeGain && audioCtx) {
+        try {
+          const now = audioCtx.currentTime;
+          // Hạ gain mượt mà trong 35ms để triệt tiêu tiếng bụp khi ngắt
+          const currentVal = Math.max(0.0001, activeGain.gain.value);
+          activeGain.gain.setValueAtTime(currentVal, now);
+          activeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+        } catch (e) {
+          console.warn("Lỗi hạ gain:", e);
+        }
+      }
+
+      const oscToStop = activeOsc;
+      const gainToClean = activeGain;
+      activeOsc = null;
+      activeGain = null;
+
+      setTimeout(() => {
+        try {
+          if (oscToStop) {
+            oscToStop.stop();
+            oscToStop.disconnect();
+          }
+          if (gainToClean) {
+            gainToClean.disconnect();
+          }
+        } catch (e) {
+          // Bỏ qua nếu đã ngắt
+        }
+      }, 45);
+
+      updateGenStateUI();
+    }
+
+    function toggleGenerator() {
+      if (isGenPlaying) {
+        stopGenerator();
+      } else {
+        startGenerator();
+      }
+    }
+
+    function setGeneratorFrequency(newFreq, syncInputs = true) {
+      let freq = parseFloat(newFreq);
+      if (isNaN(freq)) return;
+      // Giới hạn dải tần số 20.00 Hz - 2000.00 Hz
+      freq = Math.max(20.0, Math.min(2000.0, freq));
+      genFreq = freq;
+
+      if (activeOsc && audioCtx) {
+        try {
+          // Điều chỉnh mượt mà tần số của oscillator đang phát
+          activeOsc.frequency.setTargetAtTime(genFreq, audioCtx.currentTime, 0.02);
+        } catch (e) {
+          console.warn("Lỗi set frequency:", e);
+        }
+      }
+
+      // Cập nhật màn hình hiển thị lớn
+      const bigDisplay = document.getElementById('genFreqBig');
+      if (bigDisplay) {
+        bigDisplay.innerHTML = `${genFreq.toFixed(2)} <span class="gen-unit">Hz</span>`;
+      }
+
+      if (syncInputs) {
+        const input = document.getElementById('genFreqInput');
+        const slider = document.getElementById('genFreqSlider');
+        if (input && document.activeElement !== input) input.value = genFreq.toFixed(2);
+        if (slider) slider.value = genFreq;
+      }
+
+      // Cập nhật trạng thái active của Preset nếu khớp
+      updateActivePresetHighlight();
+    }
+
+    function setGeneratorWaveform(type) {
+      if (['sine', 'square', 'triangle'].indexOf(type) === -1) return;
+      genWave = type;
+      if (activeOsc) {
+        try {
+          activeOsc.type = genWave;
+        } catch (e) {
+          console.warn("Lỗi đổi dạng sóng:", e);
+        }
+      }
+      document.querySelectorAll('.gen-wave-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-wave') === type);
+      });
+    }
+
+    function setGeneratorVolume(vol) {
+      let v = parseFloat(vol);
+      if (isNaN(v)) return;
+      v = Math.max(0, Math.min(1, v));
+      genVolume = v;
+
+      if (activeGain && audioCtx) {
+        try {
+          activeGain.gain.setTargetAtTime(genVolume, audioCtx.currentTime, 0.02);
+        } catch (e) {
+          console.warn("Lỗi cập nhật âm lượng:", e);
+        }
+      }
+
+      const readout = document.getElementById('genVolReadout');
+      if (readout) {
+        readout.textContent = Math.round(genVolume * 100) + '%';
+      }
+    }
+
+    function updateActivePresetHighlight() {
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        const pFreq = parseFloat(btn.getAttribute('data-freq'));
+        const isMatch = Math.abs(pFreq - genFreq) < 0.05;
+        btn.classList.toggle('active', isMatch);
+      });
+    }
+
+    function updateGenStateUI() {
+      const card = document.getElementById('generatorCard');
+      const btn = document.getElementById('genPlayBtn');
+      const icon = document.getElementById('genPlayIcon');
+      const text = document.getElementById('genPlayText');
+      const dot = document.getElementById('genStatusDot');
+      const statusText = document.getElementById('genStatusText');
+
+      if (isGenPlaying) {
+        if (card) card.classList.add('is-playing');
+        if (btn) {
+          btn.classList.add('playing');
+          if (icon) icon.textContent = '■';
+          if (text) text.textContent = 'DỪNG PHÁT';
+        }
+        if (dot) {
+          dot.classList.remove('no-signal');
+          dot.style.background = '#4ade80';
+          dot.style.boxShadow = '0 0 10px #4ade80';
+        }
+        if (statusText) {
+          statusText.textContent = `ĐANG PHÁT (${genFreq.toFixed(2)} Hz)`;
+          statusText.style.color = '#4ade80';
+        }
+      } else {
+        if (card) card.classList.remove('is-playing');
+        if (btn) {
+          btn.classList.remove('playing');
+          if (icon) icon.textContent = '▶';
+          if (text) text.textContent = 'BẮT ĐẦU PHÁT';
+        }
+        if (dot) {
+          dot.classList.add('no-signal');
+          dot.style.background = '#64748b';
+          dot.style.boxShadow = 'none';
+        }
+        if (statusText) {
+          statusText.textContent = 'ĐANG DỪNG';
+          statusText.style.color = 'var(--text-dim)';
+        }
+      }
+    }
+
+    // Minh họa dạng sóng lý thuyết (Waveform Visualization)
+    function drawWaveformPreview() {
+      const canvas = document.getElementById('genWaveCanvas');
+      if (canvas && currentScene === 'generator') {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Đường chuẩn trục 0
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+
+        // Đường sóng
+        ctx.strokeStyle = isGenPlaying ? '#4deeea' : 'rgba(255, 226, 138, 0.7)';
+        ctx.lineWidth = isGenPlaying ? 2.5 : 1.8;
+        ctx.shadowColor = isGenPlaying ? 'rgba(77, 238, 234, 0.6)' : 'rgba(255, 226, 138, 0.2)';
+        ctx.shadowBlur = isGenPlaying ? 10 : 4;
+
+        ctx.beginPath();
+        const cycles = 3;
+        const amp = (h / 2 - 10) * (isGenPlaying ? Math.max(0.35, genVolume * 2) : 0.65);
+
+        for (let x = 0; x < w; x++) {
+          const t = (x / w) * cycles * 2 * Math.PI + wavePhase;
+          let y = 0;
+          if (genWave === 'sine') {
+            y = Math.sin(t);
+          } else if (genWave === 'square') {
+            y = Math.sin(t) >= 0 ? 0.85 : -0.85;
+          } else if (genWave === 'triangle') {
+            y = (2 / Math.PI) * Math.asin(Math.sin(t));
+          }
+          const py = h / 2 - y * amp;
+          if (x === 0) ctx.moveTo(x, py);
+          else ctx.lineTo(x, py);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Chỉ cuộn sóng khi đang phát và người dùng không bật prefers-reduced-motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (isGenPlaying && !prefersReducedMotion) {
+          wavePhase += 0.08 + Math.min(0.2, (genFreq / 2000) * 0.15);
+        }
+      }
+
+      waveAnimId = requestAnimationFrame(drawWaveformPreview);
+    }
+
+    // Gắn sự kiện các nút điều khiển của Generator
+    document.getElementById('genPlayBtn').addEventListener('click', toggleGenerator);
+
+    document.querySelectorAll('.gen-wave-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setGeneratorWaveform(btn.getAttribute('data-wave'));
+      });
+    });
+
+    const freqInput = document.getElementById('genFreqInput');
+    const freqSlider = document.getElementById('genFreqSlider');
+
+    freqSlider.addEventListener('input', (e) => {
+      setGeneratorFrequency(e.target.value, false);
+      if (freqInput) freqInput.value = parseFloat(e.target.value).toFixed(2);
+    });
+
+    freqInput.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      if (!isNaN(val) && val >= 20.0 && val <= 2000.0) {
+        setGeneratorFrequency(val, false);
+        if (freqSlider) freqSlider.value = val;
+      }
+    });
+
+    freqInput.addEventListener('change', (e) => {
+      let val = parseFloat(e.target.value);
+      if (isNaN(val) || val < 20.0) val = 20.0;
+      if (val > 2000.0) val = 2000.0;
+      setGeneratorFrequency(val, true);
+    });
+
+    document.getElementById('genVolumeSlider').addEventListener('input', (e) => {
+      setGeneratorVolume(e.target.value);
+    });
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetFreq = parseFloat(btn.getAttribute('data-freq'));
+        setGeneratorFrequency(targetFreq, true);
+      });
+    });
+
+    // Bắt đầu vòng lặp render sóng
+    drawWaveformPreview();
 
     // Bắt đầu vòng lặp polling realtime ngay khi tải trang
     fetchRealtimeDSP();
