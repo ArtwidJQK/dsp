@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Piano Tuner — Bộ Chỉnh Âm Đàn Piano</title>
+  <style>
+    /* ==========================================================================
+       1. THIẾT LẬP CƠ BẢN & PHONG CÁCH CELESTIAL / FANTASY (DESIGN SYSTEM)
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-space: #070913;
+      --bg-nebula-1: rgba(28, 18, 65, 0.7);
+      --bg-nebula-2: rgba(9, 44, 76, 0.6);
+      --gold-primary: #ffe28a;
+      --gold-light: #fff5d1;
+      --gold-glow: rgba(255, 226, 138, 0.45);
+      --gold-dim: rgba(255, 226, 138, 0.15);
+      --cyan-celestial: #4deeea;
+      --cyan-glow: rgba(77, 238, 234, 0.35);
+      --accent-purple: #9d4edd;
+      --text-main: #f0f4ff;
+      --text-dim: #9aa5c4;
+      --glass-panel: rgba(18, 22, 48, 0.72);
+      --glass-border: rgba(255, 226, 138, 0.22);
+      --ease-celestial: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-space);
+    }
+
+    body {
+      width: 100%;
+      min-height: 100%;
+      min-height: 100dvh;
+      background-color: var(--bg-space);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* Vùng chứa bầu trời sao & nền không gian đa tầng */
+    .cosmos-bg {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 25%, var(--bg-nebula-1) 0%, transparent 68%),
+                  radial-gradient(circle at 80% 80%, var(--bg-nebula-2) 0%, transparent 58%),
+                  linear-gradient(180deg, #05060d 0%, #0d1024 50%, #070814 100%);
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* Các vì sao lấp lánh (CSS Stars) */
+    .stars-layer {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(1.5px 1.5px at 15% 20%, #fff, transparent),
+        radial-gradient(2px 2px at 35% 12%, var(--gold-primary), transparent),
+        radial-gradient(1px 1px at 70% 25%, #fff, transparent),
+        radial-gradient(2px 2px at 85% 15%, var(--cyan-celestial), transparent),
+        radial-gradient(1.5px 1.5px at 20% 75%, #fff, transparent),
+        radial-gradient(2.5px 2.5px at 60% 80%, var(--gold-primary), transparent),
+        radial-gradient(1px 1px at 80% 65%, #fff, transparent),
+        radial-gradient(2px 2px at 45% 55%, var(--cyan-celestial), transparent),
+        radial-gradient(1.5px 1.5px at 90% 40%, #fff, transparent),
+        radial-gradient(1px 1px at 10% 45%, #fff, transparent);
+      background-size: 550px 550px;
+      opacity: 0.85;
+      animation: starsTwinkle 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes starsTwinkle {
+      0% { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 0.95; transform: scale(1.02); }
+    }
+
+    /* Bụi sáng nổi bồng bềnh (Floating magical dust) */
+    .dust-particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      box-shadow: 0 0 10px var(--gold-glow);
+      opacity: 0.4;
+      animation: floatDust 14s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes floatDust {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+      50% { transform: translateY(-30px) translateX(20px); opacity: 0.7; }
+    }
+
+    /* ==========================================================================
+       2. RESPONSIVE APP CONTAINER (THAY THẾ FIXED 1920x1020 SCALING HACK)
+       ========================================================================== */
+    #app-stage {
+      position: relative;
+      width: 100%;
+      min-height: 100dvh;
+      max-width: 1200px;
+      margin: 0 auto;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(14px, 3vh, 36px) clamp(16px, 4vw, 48px);
+      gap: clamp(12px, 2.5vh, 28px);
+    }
+
+    /* ==========================================================================
+       3. THANH TIỆN ÍCH TRÊN CÙNG (HEADER UTILITIES)
+       ========================================================================== */
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-tag {
+      font-size: clamp(14px, 2.2vw, 20px);
+      letter-spacing: clamp(2px, 0.4vw, 4px);
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      text-shadow: 0 0 12px var(--gold-glow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .brand-tag .crest-icon {
+      color: var(--gold-primary);
+      font-size: 1.1em;
+      filter: drop-shadow(0 0 6px var(--gold-glow));
+    }
+
+    .top-actions {
+      display: flex;
+      gap: clamp(8px, 1.5vw, 14px);
+      align-items: center;
+    }
+
+    .util-btn {
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      color: var(--text-dim);
+      padding: clamp(8px, 1.4vh, 10px) clamp(12px, 2vw, 20px);
+      border-radius: 30px;
+      font-size: clamp(12px, 1.5vw, 14px);
+      letter-spacing: 1px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.25s var(--ease-celestial);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+    }
+
+    .util-btn:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      box-shadow: 0 0 16px var(--gold-glow);
+      transform: translateY(-1px);
+    }
+
+    .util-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* ==========================================================================
+       4. VÙNG CHỨA CÁC SCENE & ANIMATION ENTRANCE
+       ========================================================================== */
+    .scene-container {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 15;
+      min-height: 0;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+    }
+
+    .scene.active {
+      display: flex;
+      animation: sceneFadeIn 0.35s var(--ease-celestial) forwards;
+    }
+
+    @keyframes sceneFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ==========================================================================
+       5. SCENE 1: COVER (MÀN HÌNH BÌA FANTASY)
+       ========================================================================== */
+    .cover-content {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(14px, 2.5vh, 26px);
+      width: 100%;
+      max-width: 820px;
+      padding: clamp(16px, 3vh, 28px) clamp(12px, 3vw, 24px);
+    }
+
+    .celestial-crest {
+      font-size: clamp(38px, 6vw, 54px);
+      color: var(--gold-primary);
+      text-shadow: 0 0 25px var(--gold-glow), 0 0 50px var(--gold-glow);
+      animation: pulseGlow 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0% { transform: scale(0.96); opacity: 0.85; filter: drop-shadow(0 0 10px var(--gold-glow)); }
+      100% { transform: scale(1.04); opacity: 1; filter: drop-shadow(0 0 30px var(--gold-primary)); }
+    }
+
+    .cover-title {
+      font-size: clamp(44px, 9vw, 80px);
+      font-weight: 300;
+      letter-spacing: clamp(6px, 1.4vw, 12px);
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 20%, var(--gold-primary) 70%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-top: -6px;
+      line-height: 1.1;
+    }
+
+    .cover-subtitle {
+      font-size: clamp(16px, 3.2vw, 26px);
+      letter-spacing: clamp(3px, 0.8vw, 7px);
+      color: var(--cyan-celestial);
+      text-transform: uppercase;
+      font-weight: 400;
+      text-shadow: 0 0 15px var(--cyan-glow);
+      line-height: 1.3;
+    }
+
+    .cover-quote {
+      font-size: clamp(14px, 2.4vw, 20px);
+      font-style: italic;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      line-height: 1.6;
+      max-width: 640px;
+    }
+
+    /* Phím đàn Piano cách điệu (Silhouette SVG) */
+    .piano-silhouette {
+      width: min(380px, 86vw);
+      height: auto;
+      max-height: 60px;
+      opacity: 0.8;
+      filter: drop-shadow(0 0 12px var(--cyan-glow));
+    }
+
+    .btn-celestial-start {
+      background: linear-gradient(135deg, rgba(255, 226, 138, 0.16), rgba(77, 238, 234, 0.22));
+      border: 1px solid var(--gold-primary);
+      color: #fff;
+      font-size: clamp(15px, 2.5vw, 20px);
+      font-weight: 600;
+      letter-spacing: clamp(2px, 0.6vw, 5px);
+      text-transform: uppercase;
+      padding: clamp(14px, 2.2vh, 18px) clamp(28px, 5vw, 50px);
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255, 226, 138, 0.3), inset 0 0 15px rgba(255, 226, 138, 0.2);
+      transition: all 0.3s var(--ease-celestial);
+      min-height: 48px;
+    }
+
+    .btn-celestial-start:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 0 45px rgba(255, 226, 138, 0.6), inset 0 0 25px rgba(77, 238, 234, 0.4);
+      border-color: #fff;
+      color: var(--gold-primary);
+    }
+
+    .btn-celestial-start:active {
+      transform: scale(0.97);
+    }
+
+    /* ==========================================================================
+       6. SCENE 2: TUNER (BỘ CHỈNH ÂM CHÍNH - RESPONSIVE & MOTION SYSTEM)
+       ========================================================================== */
+    .tuner-card {
+      width: 100%;
+      max-width: 940px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: clamp(20px, 3.5vw, 28px);
+      padding: clamp(20px, 3.5vh, 36px) clamp(16px, 4vw, 48px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(28, 18, 65, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(14px, 2vh, 22px);
+      position: relative;
+      transition: border-color 0.4s var(--ease-celestial), box-shadow 0.4s var(--ease-celestial);
+    }
+
+    /* Hiệu ứng thở nhẹ khi có tín hiệu hợp lệ */
+    .tuner-card.has-signal {
+      border-color: rgba(77, 238, 234, 0.35);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(77, 238, 234, 0.16);
+    }
+
+    .tuner-header-title {
+      font-size: clamp(14px, 2.2vw, 20px);
+      letter-spacing: clamp(2px, 0.5vw, 5px);
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      text-shadow: 0 0 12px var(--gold-glow);
+      text-align: center;
+    }
+
+    /* Nốt nhạc trung tâm */
+    .note-spotlight {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 4px 0;
+    }
+
+    .note-badge {
+      font-size: clamp(64px, 15vw, 108px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-shadow: 0 0 35px var(--gold-primary), 0 0 70px var(--gold-glow);
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+      will-change: transform;
+    }
+
+    /* Highlight nhẹ khi nốt thay đổi */
+    .note-badge.note-highlight {
+      animation: noteChangeGlow 0.45s ease-out;
+    }
+
+    @keyframes noteChangeGlow {
+      0% {
+        transform: scale(1.08);
+        text-shadow: 0 0 45px #fff, 0 0 80px var(--gold-primary);
+      }
+      100% {
+        transform: scale(1);
+        text-shadow: 0 0 35px var(--gold-primary), 0 0 70px var(--gold-glow);
+      }
+    }
+
+    .note-freq-sub {
+      font-size: clamp(18px, 3.5vw, 25px);
+      letter-spacing: clamp(1.5px, 0.3vw, 3px);
+      color: var(--cyan-celestial);
+      margin-top: 8px;
+      text-shadow: 0 0 10px var(--cyan-glow);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Thước đo Cents Meter (-50 -> 0 -> +50) */
+    .cents-meter-container {
+      width: 100%;
+      max-width: 820px;
+      margin: 6px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .meter-track-box {
+      width: 100%;
+      height: clamp(48px, 7.5vw, 58px);
+      position: relative;
+      background: rgba(10, 14, 30, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.85);
+    }
+
+    /* Vùng an toàn / trung tâm (±3 cents) */
+    .center-sweet-spot {
+      position: absolute;
+      left: calc(50% - clamp(16px, 3vw, 25px));
+      width: clamp(32px, 6vw, 50px);
+      height: 100%;
+      background: rgba(77, 238, 234, 0.14);
+      border-left: 1px dashed rgba(77, 238, 234, 0.5);
+      border-right: 1px dashed rgba(77, 238, 234, 0.5);
+    }
+
+    /* Vạch chia độ (Ticks) */
+    .meter-ticks {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 clamp(10px, 2.5vw, 20px);
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .tick {
+      width: 1px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .tick.major {
+      height: 22px;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .tick.zero {
+      height: 38px;
+      width: 3px;
+      background: var(--gold-primary);
+      box-shadow: 0 0 10px var(--gold-primary);
+    }
+
+    /* Kim / Marker Cents */
+    .cents-marker {
+      position: absolute;
+      top: 5px;
+      bottom: 5px;
+      width: 5px;
+      border-radius: 3px;
+      background: #ffffff;
+      box-shadow: 0 0 14px #ffffff, 0 0 28px var(--cyan-celestial);
+      left: 50%;
+      transform: translateX(-50%);
+      transition: left 0.18s var(--ease-celestial);
+      will-change: left;
+    }
+
+    .meter-labels {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: clamp(12px, 2vw, 15px);
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      padding: 0 4px;
+    }
+
+    .meter-readout {
+      font-size: clamp(24px, 5vw, 32px);
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--gold-primary);
+      text-shadow: 0 0 15px var(--gold-glow);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Lưới thông số phụ (Target, Confidence, Estimator, Signal) */
+    .tuner-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(10px, 1.8vw, 18px);
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .stat-pill {
+      background: rgba(14, 18, 40, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: clamp(12px, 2vw, 16px);
+      padding: clamp(10px, 1.8vh, 14px) clamp(8px, 1.5vw, 14px);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .stat-label {
+      font-size: clamp(11px, 1.6vw, 13px);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-value {
+      font-size: clamp(15px, 2.4vw, 19px);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .signal-status-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 10px #4ade80;
+      flex-shrink: 0;
+      animation: signalPulse 2s infinite ease-in-out;
+    }
+
+    .status-dot.no-signal {
+      background: #64748b;
+      box-shadow: none;
+      animation: none;
+    }
+
+    @keyframes signalPulse {
+      0%, 100% {
+        box-shadow: 0 0 8px #4ade80;
+      }
+      50% {
+        box-shadow: 0 0 16px #4ade80, 0 0 24px rgba(74, 222, 128, 0.4);
+      }
+    }
+
+    /* ==========================================================================
+       7. SCENE 3: GIỚI THIỆU (THÔNG TIN HỆ THỐNG & PIPELINE)
+       ========================================================================== */
+    .info-card {
+      width: 100%;
+      max-width: 960px;
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: clamp(20px, 3.5vw, 28px);
+      padding: clamp(24px, 4vh, 44px) clamp(16px, 4vw, 48px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(18px, 3vh, 28px);
+    }
+
+    .info-title {
+      font-size: clamp(22px, 4vw, 32px);
+      letter-spacing: clamp(3px, 0.6vw, 6px);
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      text-align: center;
+      text-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    .info-desc {
+      font-size: clamp(14px, 2.2vw, 18px);
+      line-height: 1.7;
+      color: var(--text-main);
+      text-align: center;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Lưu đồ Pipeline DSP */
+    .pipeline-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(6px, 1.2vw, 10px);
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    .pipeline-step {
+      background: rgba(22, 28, 62, 0.85);
+      border: 1px solid rgba(77, 238, 234, 0.3);
+      border-radius: 10px;
+      padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2vw, 18px);
+      font-size: clamp(12px, 1.8vw, 14px);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--cyan-celestial);
+      text-align: center;
+      box-shadow: 0 0 15px rgba(77, 238, 234, 0.15);
+      transition: all 0.25s var(--ease-celestial);
+    }
+
+    .pipeline-step:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      transform: translateY(-2px);
+    }
+
+    .pipeline-arrow {
+      font-size: clamp(14px, 2vw, 18px);
+      color: var(--gold-primary);
+    }
+
+    .info-standard {
+      text-align: center;
+      font-size: clamp(13px, 2vw, 17px);
+      color: var(--gold-primary);
+      letter-spacing: 1.5px;
+      background: rgba(255, 226, 138, 0.08);
+      padding: clamp(10px, 1.8vh, 14px) clamp(16px, 3vw, 24px);
+      border-radius: 20px;
+      border: 1px dashed rgba(255, 226, 138, 0.3);
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       8. THANH ĐIỀU HƯỚNG CỐ ĐỊNH PHÍA DƯỚI (NAVIGATION BAR)
+       ========================================================================== */
+    .bottom-nav {
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      padding: 6px 12px;
+      display: flex;
+      gap: clamp(6px, 1.5vw, 14px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+      flex-shrink: 0;
+      max-width: 100%;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: clamp(13px, 1.8vw, 15px);
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: clamp(10px, 1.6vh, 12px) clamp(14px, 2.5vw, 24px);
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-celestial);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+    }
+
+    .nav-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-btn:active {
+      transform: scale(0.96);
+    }
+
+    .nav-btn.active {
+      color: var(--gold-primary);
+      background: rgba(255, 226, 138, 0.16);
+      box-shadow: 0 0 18px var(--gold-glow);
+    }
+
+    /* ==========================================================================
+       9. RÈM CHUYỂN CẢNH (CURTAIN TRANSITION)
+       ========================================================================== */
+    .curtain-wrapper {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .curtain-panel {
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(135deg, #090a18 0%, #151834 60%, #0d0f22 100%);
+      border-bottom: 2px solid var(--gold-primary);
+      position: relative;
+      transition: transform 0.42s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .curtain-left {
+      transform: translateX(-100%);
+      border-right: 1px solid rgba(255, 226, 138, 0.4);
+    }
+
+    .curtain-right {
+      transform: translateX(100%);
+      border-left: 1px solid rgba(255, 226, 138, 0.4);
+    }
+
+    .curtain-wrapper.closed .curtain-left {
+      transform: translateX(0);
+    }
+
+    .curtain-wrapper.closed .curtain-right {
+      transform: translateX(0);
+    }
+
+    .curtain-ornament {
+      position: absolute;
+      top: 50%;
+      font-size: clamp(36px, 8vw, 60px);
+      color: var(--gold-primary);
+      opacity: 0.35;
+      transform: translateY(-50%);
+    }
+
+    .curtain-left .curtain-ornament { right: clamp(15px, 4vw, 30px); }
+    .curtain-right .curtain-ornament { left: clamp(15px, 4vw, 30px); }
+
+    /* ==========================================================================
+       10. MEDIA QUERIES: TABLET, MOBILE PORTRAIT & MOBILE LANDSCAPE
+       ========================================================================== */
+
+    /* TABLET & MÀN HÌNH NHỎ (<= 900px) */
+    @media (max-width: 900px) {
+      .tuner-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+
+    /* MOBILE PORTRAIT (<= 640px) */
+    @media (max-width: 640px) {
+      #app-stage {
+        padding: 12px 14px;
+        gap: 14px;
+      }
+
+      .top-bar {
+        justify-content: space-between;
+      }
+
+      .brand-tag {
+        letter-spacing: 1.5px;
+      }
+
+      .top-actions .util-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-height: 36px;
+      }
+
+      .top-actions .util-btn span:last-child {
+        display: none; /* Chỉ hiện biểu tượng trên màn hình rất hẹp */
+      }
+
+      .tuner-card {
+        padding: 18px 14px;
+        border-radius: 20px;
+        gap: 14px;
+      }
+
+      .tuner-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .stat-pill {
+        padding: 8px 6px;
+      }
+
+      .stat-label {
+        font-size: 10.5px;
+      }
+
+      .stat-value {
+        font-size: 14.5px;
+      }
+
+      .bottom-nav {
+        width: 100%;
+        max-width: 420px;
+        justify-content: space-between;
+        padding: 4px 6px;
+        gap: 4px;
+      }
+
+      .nav-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 6px;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        min-height: 42px;
+      }
+
+      .nav-btn span:first-child {
+        font-size: 1.1em;
+      }
+
+      .pipeline-container {
+        gap: 6px;
+      }
+
+      .pipeline-step {
+        padding: 6px 10px;
+        font-size: 11.5px;
+      }
+
+      .pipeline-arrow {
+        font-size: 13px;
+      }
+    }
+
+    /* MOBILE LANDSCAPE (Chiều cao hạn chế <= 520px) */
+    @media (max-height: 520px) and (orientation: landscape) {
+      #app-stage {
+        padding: 8px 16px;
+        gap: 8px;
+        min-height: auto;
+      }
+
+      .top-bar {
+        margin-bottom: 2px;
+      }
+
+      .tuner-card {
+        padding: 12px 20px;
+        gap: 8px;
+      }
+
+      .note-spotlight {
+        margin: 0;
+      }
+
+      .note-badge {
+        font-size: clamp(40px, 12vh, 60px);
+      }
+
+      .note-freq-sub {
+        font-size: 15px;
+        margin-top: 2px;
+      }
+
+      .meter-track-box {
+        height: 38px;
+      }
+
+      .meter-readout {
+        font-size: 20px;
+      }
+
+      .tuner-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 2px;
+      }
+
+      .stat-pill {
+        padding: 6px 8px;
+      }
+
+      .bottom-nav {
+        padding: 3px 8px;
+        gap: 6px;
+      }
+
+      .nav-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-height: 36px;
+      }
+    }
+
+    /* ACCESSIBILITY: PREFERS-REDUCED-MOTION */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .stars-layer,
+      .dust-particle,
+      .status-dot,
+      .celestial-crest {
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NỀN KHÔNG GIAN ĐA TẦNG & SAO -->
+  <div class="cosmos-bg">
+    <div class="stars-layer"></div>
+    <div class="dust-particle" style="width:4px; height:4px; top:25%; left:18%; animation-delay:0s;"></div>
+    <div class="dust-particle" style="width:6px; height:6px; top:40%; left:75%; animation-delay:3s;"></div>
+    <div class="dust-particle" style="width:3px; height:3px; top:65%; left:30%; animation-delay:6s;"></div>
+    <div class="dust-particle" style="width:5px; height:5px; top:75%; left:85%; animation-delay:1s;"></div>
+    <div class="dust-particle" style="width:4px; height:4px; top:15%; left:60%; animation-delay:4s;"></div>
+  </div>
+
+  <!-- RÈM SÂN KHẤU CHUYỂN CẢNH (CURTAIN TRANSITION) -->
+  <div class="curtain-wrapper" id="curtainWrapper">
+    <div class="curtain-panel curtain-left">
+      <div class="curtain-ornament">✦</div>
+    </div>
+    <div class="curtain-panel curtain-right">
+      <div class="curtain-ornament">✧</div>
+    </div>
+  </div>
+
+  <!-- KHUNG ỨNG DỤNG RESPONSIVE THỰC THỤ (FLUID CONTAINER) -->
+  <div id="app-stage">
+    
+    <!-- THANH TIỆN ÍCH TRÊN CÙNG -->
+    <header class="top-bar">
+      <div class="brand-tag">
+        <span class="crest-icon">✦</span>
+        <span>BỘ CHỈNH ÂM PIANO</span>
+      </div>
+      <div class="top-actions">
+        <!-- Nút âm nhạc: UI Shell cho tương lai -->
+        <button class="util-btn" id="btnMusic" title="Âm nhạc">
+          <span>♪</span>
+          <span>ÂM NHẠC</span>
+        </button>
+        <!-- Nút cài đặt: UI Shell cho tương lai -->
+        <button class="util-btn" id="btnSettings" title="Cài đặt">
+          <span>⚙</span>
+          <span>CÀI ĐẶT</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- VÙNG CHỨA CÁC SCENE CHÍNH -->
+    <main class="scene-container">
+      
+      <!-- ======================================================================
+           SCENE 1: COVER (MÀN HÌNH MỞ ĐẦU)
+           ====================================================================== -->
+      <section class="scene active" id="scene-cover">
+        <div class="cover-content">
+          <div class="celestial-crest">✦</div>
+          <h1 class="cover-title">PIANO</h1>
+          <h2 class="cover-subtitle">BỘ CHỈNH ÂM HUYỀN DIỆU</h2>
+          <p class="cover-quote">"Đưa từng nốt nhạc về đúng cao độ thuần khiết của vũ trụ"</p>
+          
+          <!-- Phím đàn cách điệu -->
+          <svg class="piano-silhouette" viewBox="0 0 400 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="5" width="380" height="50" rx="6" stroke="#ffe28a" stroke-width="2" fill="rgba(18,22,48,0.5)"/>
+            <line x1="50" y1="5" x2="50" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="90" y1="5" x2="90" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="130" y1="5" x2="130" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="170" y1="5" x2="170" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="210" y1="5" x2="210" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="250" y1="5" x2="250" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="290" y1="5" x2="290" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="330" y1="5" x2="330" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <line x1="370" y1="5" x2="370" y2="55" stroke="#ffe28a" stroke-width="1.5" opacity="0.6"/>
+            <!-- Phím đen -->
+            <rect x="35" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+            <rect x="75" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+            <rect x="155" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+            <rect x="195" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+            <rect x="235" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+            <rect x="315" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+            <rect x="355" y="5" width="20" height="32" rx="2" fill="#4deeea" opacity="0.8"/>
+          </svg>
+
+          <button class="btn-celestial-start" id="btnStartTuner">
+            NHẤN ĐỂ BẮT ĐẦU
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           SCENE 2: TUNER (MÀN HÌNH BỘ CHỈNH ÂM CHÍNH)
+           ====================================================================== -->
+      <section class="scene" id="scene-tuner">
+        <div class="tuner-card" id="tunerCard">
+          <div class="tuner-header-title">BỘ CHỈNH ÂM ĐÀN PIANO</div>
+
+          <!-- Nốt nhạc trung tâm -->
+          <div class="note-spotlight">
+            <div class="note-badge" id="uiNote">--</div>
+            <div class="note-freq-sub" id="uiFrequency">-- Hz</div>
+          </div>
+
+          <!-- Cents Meter (-50 -> 0 -> +50) -->
+          <div class="cents-meter-container">
+            <div class="meter-track-box">
+              <div class="center-sweet-spot"></div>
+              <div class="meter-ticks">
+                <div class="tick major"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick major"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick zero"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick major"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick"></div>
+                <div class="tick major"></div>
+              </div>
+              <div class="cents-marker" id="uiCentsMarker" style="left: 50%;"></div>
+            </div>
+
+            <div class="meter-labels">
+              <span>-50</span>
+              <span>-25</span>
+              <span style="color:var(--gold-primary); font-weight:bold;">0 (CHUẨN)</span>
+              <span>+25</span>
+              <span>+50</span>
+            </div>
+
+            <div class="meter-readout" id="uiCentsText">-- cent</div>
+          </div>
+
+          <!-- Lưới thông số phụ -->
+          <div class="tuner-stats-grid">
+            <div class="stat-pill">
+              <span class="stat-label">Tần số mục tiêu</span>
+              <span class="stat-value" id="uiTarget">-- Hz</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Độ tin cậy</span>
+              <span class="stat-value" id="uiConfidence">0%</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Phương pháp</span>
+              <span class="stat-value" id="uiEstimator">NO_SIGNAL</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Trạng thái</span>
+              <div class="stat-value signal-status-box">
+                <span class="status-dot no-signal" id="uiStatusDot"></span>
+                <span id="uiStatusText" style="color: var(--text-dim);">KHÔNG CÓ TÍN HIỆU</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           SCENE 3: GIỚI THIỆU (THÔNG TIN HỆ THỐNG)
+           ====================================================================== -->
+      <section class="scene" id="scene-info">
+        <div class="info-card">
+          <h2 class="info-title">VỀ BỘ CHỈNH ÂM</h2>
+          <p class="info-desc">
+            Thiết bị sử dụng microphone số INMP441 để thu âm thanh piano và xử lý tín hiệu số chuyên sâu trên vi điều khiển ESP32-S3.
+          </p>
+
+          <!-- Quy trình xử lý tín hiệu số -->
+          <div class="pipeline-container">
+            <div class="pipeline-step">Âm thanh Piano</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">INMP441</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">I2S DMA</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Biến đổi FFT</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Ước lượng Tần số</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Nhận diện Nốt nhạc</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Hiển thị Giao diện</div>
+          </div>
+
+          <div class="info-standard">
+            ✦ Nốt chuẩn A4 được quy ước có tần số chính xác là 440.00 Hz ✦
+          </div>
+
+          <div style="text-align: center; margin-top: 6px;">
+            <button class="btn-celestial-start" id="btnBackToTuner" style="padding: 12px 36px; font-size: clamp(14px, 2vw, 17px);">
+              QUAY LẠI BỘ CHỈNH ÂM
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- THANH ĐIỀU HƯỚNG CỐ ĐỊNH PHÍA DƯỚI -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="navCover" data-scene="cover">
+        <span>✦</span>
+        <span>BẮT ĐẦU</span>
+      </button>
+      <button class="nav-btn" id="navTuner" data-scene="tuner">
+        <span>🎹</span>
+        <span>CHỈNH ÂM</span>
+      </button>
+      <button class="nav-btn" id="navInfo" data-scene="info">
+        <span>ℹ</span>
+        <span>GIỚI THIỆU</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- ==========================================================================
+       11. JAVASCRIPT ĐIỀU KHIỂN GIAO DIỆN & REALTIME API POLLING
+       ========================================================================== -->
+  <script>
+    // 1. QUẢN LÝ SCENE & HIỆU ỨNG RÈM SÂN KHẤU (CURTAIN TRANSITION)
+    let currentScene = 'cover';
+    let isTransitioning = false;
+
+    function switchSceneWithCurtain(targetScene) {
+      if (currentScene === targetScene || isTransitioning) return;
+      isTransitioning = true;
+
+      const curtain = document.getElementById('curtainWrapper');
+      
+      // Bước 1: Đóng rèm
+      curtain.classList.add('closed');
+
+      // Bước 2: Đổi scene sau khi rèm đóng kín (~420ms)
+      setTimeout(() => {
+        // Cập nhật DOM scenes
+        document.querySelectorAll('.scene').forEach(sc => sc.classList.remove('active'));
+        const nextSceneEl = document.getElementById(`scene-${targetScene}`);
+        if (nextSceneEl) {
+          nextSceneEl.classList.add('active');
+        }
+
+        // Cập nhật thanh điều hướng
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-scene') === targetScene);
+        });
+
+        currentScene = targetScene;
+
+        // Bước 3: Mở rèm
+        setTimeout(() => {
+          curtain.classList.remove('closed');
+          setTimeout(() => {
+            isTransitioning = false;
+          }, 420);
+        }, 80);
+
+      }, 420);
+    }
+
+    // 2. GẮN SỰ KIỆN ĐIỀU HƯỚNG
+    document.getElementById('navCover').addEventListener('click', () => switchSceneWithCurtain('cover'));
+    document.getElementById('navTuner').addEventListener('click', () => switchSceneWithCurtain('tuner'));
+    document.getElementById('navInfo').addEventListener('click', () => switchSceneWithCurtain('info'));
+    document.getElementById('btnStartTuner').addEventListener('click', () => switchSceneWithCurtain('tuner'));
+    document.getElementById('btnBackToTuner').addEventListener('click', () => switchSceneWithCurtain('tuner'));
+
+    // Gắn sự kiện các nút tiện ích (UI Shell: tương lai)
+    document.getElementById('btnMusic').addEventListener('click', () => {
+      alert('Chức năng Âm nhạc đang được chuẩn bị.');
+    });
+
+    document.getElementById('btnSettings').addEventListener('click', () => {
+      alert('Chức năng Cài đặt đang được chuẩn bị.');
+    });
+
+    // ==========================================================================
+    // 3. REALTIME POLLING TỪ ENDPOINT /api/data (ESP32 DSP DATA) & MOTION UPDATES
+    // ==========================================================================
+    let isFetching = false;
+    let lastObservedNote = '--';
+    let noteHighlightTimeout = null;
+    const POLLING_INTERVAL_MS = 130; // Chu kỳ ~130ms tương ứng với bước nhảy 128ms của DSP
+
+    async function fetchRealtimeDSP() {
+      if (isFetching) return;
+      isFetching = true;
+
+      try {
+        const response = await fetch('/api/data', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        const data = await response.json();
+        updateTunerUI(data);
+      } catch (err) {
+        handleConnectionError(err);
+      } finally {
+        isFetching = false;
+        setTimeout(fetchRealtimeDSP, POLLING_INTERVAL_MS);
+      }
+    }
+
+    function updateTunerUI(data) {
+      const cardEl = document.getElementById('tunerCard');
+      const noteEl = document.getElementById('uiNote');
+      const freqEl = document.getElementById('uiFrequency');
+      const targetEl = document.getElementById('uiTarget');
+      const confEl = document.getElementById('uiConfidence');
+      const estEl = document.getElementById('uiEstimator');
+      const centsEl = document.getElementById('uiCentsText');
+      const markerEl = document.getElementById('uiCentsMarker');
+      const dotEl = document.getElementById('uiStatusDot');
+      const statusTextEl = document.getElementById('uiStatusText');
+
+      if (data && data.valid && data.frequency > 10.0) {
+        // CÓ TÍN HIỆU HỢP LỆ TỪ DSP
+        const currentNote = data.note || '--';
+        
+        // Motion: Highlight nốt nhạc khi chuyển nốt mới
+        if (currentNote !== lastObservedNote && currentNote !== '--') {
+          noteEl.classList.remove('note-highlight');
+          void noteEl.offsetWidth; // Trigger reflow
+          noteEl.classList.add('note-highlight');
+          if (noteHighlightTimeout) clearTimeout(noteHighlightTimeout);
+          noteHighlightTimeout = setTimeout(() => {
+            noteEl.classList.remove('note-highlight');
+          }, 450);
+          lastObservedNote = currentNote;
+        }
+
+        noteEl.textContent = currentNote;
+        freqEl.textContent = data.frequency.toFixed(2) + ' Hz';
+        targetEl.textContent = data.target ? data.target.toFixed(2) + ' Hz' : '-- Hz';
+        confEl.textContent = Math.round(data.confidence) + '%';
+        estEl.textContent = data.estimator || 'F1_PRIMARY';
+
+        // Cents: Hiển thị độ lệch thực tế và di chuyển kim đo
+        const cents = data.cents;
+        const sign = cents >= 0 ? '+' : '';
+        centsEl.textContent = sign + cents.toFixed(2) + ' cent';
+
+        // Kim đo clamp trong dải [-50, +50] cent, center 0 tương ứng với 50%
+        const clampedCents = Math.max(-50, Math.min(50, cents));
+        const percentage = ((clampedCents + 50) / 100) * 100;
+        markerEl.style.left = percentage + '%';
+
+        // Đèn chỉ báo & Thẻ Tuner: CÓ TÍN HIỆU
+        dotEl.classList.remove('no-signal');
+        statusTextEl.textContent = 'CÓ TÍN HIỆU';
+        statusTextEl.style.color = '#4ade80';
+        if (cardEl) cardEl.classList.add('has-signal');
+      } else {
+        // KHÔNG CÓ TÍN HIỆU (NO_SIGNAL / WEAK_SIGNAL)
+        lastObservedNote = '--';
+        noteEl.textContent = '--';
+        noteEl.classList.remove('note-highlight');
+        freqEl.textContent = '-- Hz';
+        targetEl.textContent = '-- Hz';
+        confEl.textContent = Math.round(data && data.confidence ? data.confidence : 0) + '%';
+        estEl.textContent = (data && data.estimator) ? data.estimator : 'NO_SIGNAL';
+        centsEl.textContent = '-- cent';
+
+        // Kim đo về giữa
+        markerEl.style.left = '50%';
+
+        // Đèn chỉ báo & Thẻ Tuner: KHÔNG CÓ TÍN HIỆU
+        dotEl.classList.add('no-signal');
+        statusTextEl.textContent = 'KHÔNG CÓ TÍN HIỆU';
+        statusTextEl.style.color = 'var(--text-dim)';
+        if (cardEl) cardEl.classList.remove('has-signal');
+      }
+    }
+
+    function handleConnectionError(err) {
+      const cardEl = document.getElementById('tunerCard');
+      const dotEl = document.getElementById('uiStatusDot');
+      const statusTextEl = document.getElementById('uiStatusText');
+      const estEl = document.getElementById('uiEstimator');
+      
+      dotEl.classList.add('no-signal');
+      statusTextEl.textContent = 'MẤT KẾT NỐI';
+      statusTextEl.style.color = '#f87171';
+      estEl.textContent = 'LỖI MẠNG';
+      if (cardEl) cardEl.classList.remove('has-signal');
+    }
+
+    // Bắt đầu vòng lặp polling realtime ngay khi tải trang
+    fetchRealtimeDSP();
+  </script>
+</body>
+</html>

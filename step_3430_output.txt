@@ -1,0 +1,44 @@
+Created At: 2026-10-06T00:07:39+07:00
+Completed At: 2026-10-06T00:07:39+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/main.c`
+Total Lines: 1600
+Total Bytes: 71565
+Showing lines 970 to 1005
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+970:         float sel_prominence = sel_mag / (sel_local_floor > 0.05f ? sel_local_floor : 0.05f);
+971:         float sel_snr_db = 20.0f * log10f(sel_prominence > 0.1f ? sel_prominence : 0.1f);
+972: 
+973:         pitch_state_t state = PITCH_NO_SIGNAL;
+974:         bool pass_energy_gate = (raw_ac_rms_norm >= MIN_AC_RMS_NORM);
+975: 
+976:         if (pass_energy_gate && best_hyp_score >= 20.0f) {
+977:             if (best_hyp_freq < 110.0f) {
+978:                 // Tần số thấp (< 110 Hz): Phải có ít nhất 3 họa âm liên kết
+979:                 if (best_h_count >= 3 && cand_peak_mag >= 14.0f) {
+980:                     state = PITCH_VALID_PITCH;
+981:                 } else if (best_h_count >= 2 && cand_peak_mag >= 9.0f) {
+982:                     state = PITCH_WEAK_SIGNAL;
+983:                 } else {
+984:                     state = PITCH_NO_SIGNAL;
+985:                 }
+986:             } else {
+987:                 // Tần số >= 110 Hz (bao gồm C4, A4, C5):
+988:                 // Được xác thực VALID_PITCH khi điểm nhất quán họa âm cao hoặc độ nổi bật phổ tốt
+989:                 if ((best_hyp_score >= 120.0f) ||
+990:                     (sel_prominence >= 4.0f && sel_mag >= 1.5f) ||
+991:                     (primary_cand->prominence >= 6.0f && primary_cand->mag >= 2.0f && best_h_count >= 2)) {
+992:                     state = PITCH_VALID_PITCH;
+993:                 } else if (best_hyp_score >= 40.0f || sel_prominence >= 2.5f) {
+994:                     state = PITCH_WEAK_SIGNAL;
+995:                 } else {
+996:                     state = PITCH_NO_SIGNAL;
+997:                 }
+998:             }
+999:         } else {
+1000:             state = PITCH_NO_SIGNAL;
+1001:         }
+1002: 
+1003:         // Tính độ tin cậy [0 .. 100%]
+1004:         float confidence = 0.0f;
+1005:         if (state == PITCH_VALID_PITCH) {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

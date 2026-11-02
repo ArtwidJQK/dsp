@@ -1,0 +1,176 @@
+==================== [E2-DIAG FRAME #311] ====================
+RMS Energy Norm : 0.105737 (Gate >= 0.0020) | State: NO_SIGNAL
+A. Top 5 Spectral Peaks:
+   #1: Bin   80 | Raw:  312.50 Hz | Interp:  313.92 Hz | Mag:  31.82 | Floor:  8.96 | Prom:   3.6x | SNR: +11.0 dB
+   #2: Bin  834 | Raw: 3257.81 Hz | Interp: 3256.24 Hz | Mag:   9.80 | Floor:  3.36 | Prom:   2.9x | SNR:  +9.3 dB
+   #3: Bin  127 | Raw:  496.09 Hz | Interp:  494.27 Hz | Mag:   6.30 | Floor:  2.66 | Prom:   2.4x | SNR:  +7.5 dB
+   #4: Bin  853 | Raw: 3332.03 Hz | Interp: 3331.72 Hz | Mag:   5.68 | Floor:  2.14 | Prom:   2.7x | SNR:  +8.5 dB
+   #5: Bin  210 | Raw:  820.31 Hz | Interp:  818.91 Hz | Mag:   5.25 | Floor:  2.41 | Prom:   2.2x | SNR:  +6.8 dB
+B. Selected Hypothesis Harmonics (best_hyp = 312.50 Hz):
+   m=1: Target:  312.50 Hz (Bin   80) | Peak:  312.50 Hz (Bin   80) | f0/1:  313.92 Hz | Mag: 31.82 | Prom:  3.6x (SNR +11.0 dB) | Gate: FAIL
+   m=2: Target:  625.00 Hz (Bin  160) | Peak:  621.09 Hz (Bin  159) | f0/2:  310.46 Hz | Mag:  3.11 | Prom:  1.4x (SNR  +2.8 dB) | Gate: FAIL
+   m=3: Target:  937.50 Hz (Bin  240) | Peak:  941.41 Hz (Bin  241) | f0/3:  313.70 Hz | Mag:  2.19 | Prom:  1.4x (SNR  +2.6 dB) | Gate: FAIL
+   m=4: Target: 1250.00 Hz (Bin  320) | Peak: 1253.91 Hz (Bin  321) | f0/4:  313.13 Hz | Mag:  1.28 | Prom:  1.8x (SNR  +5.1 dB) | Gate: FAIL
+C. Candidate Scoring Ranking (Total Tested: 16):
+   Rank # 1: Cand 312.50 Hz (Base 312.50 /1) | Final:   8.55 (Raw:   8.55) | H_Count: 1 (Mask 0x01) | DomBin   80 | Pen: 
+   Rank # 2: Cand 1457.03 Hz (Base 1457.03 /1) | Final:   3.99 (Raw:   3.99) | H_Count: 2 (Mask 0x05) | DomBin  373 | Pen: 
+   Rank # 3: Cand 654.30 Hz (Base 1308.59 /2) | Final:   3.08 (Raw:   3.63) | H_Count: 2 (Mask 0x06) | DomBin  335 | Pen: [M1_RESCUED:x0.85] 
+   Rank # 4: Cand 496.09 Hz (Base 496.09 /1) | Final:   3.05 (Raw:   3.05) | H_Count: 1 (Mask 0x01) | DomBin  127 | Pen: 
+   Rank # 5: Cand 1308.59 Hz (Base 1308.59 /1) | Final:   2.02 (Raw:   2.02) | H_Count: 1 (Mask 0x01) | DomBin  335 | Pen: 
+   Rank # 6: Cand 436.20 Hz (Base 1308.59 /3) | Final:   0.62 (Raw:   3.09) | H_Count: 2 (Mask 0x0C) | DomBin  335 | Pen: [NO_M1:x0.20] 
+   Rank # 7: Cand 165.36 Hz (Base 496.09 /3) | Final:   0.35 (Raw:   1.76) | H_Count: 1 (Mask 0x04) | DomBin  127 | Pen: [NO_M1:x0.20] 
+   Rank # 8: Cand 156.25 Hz (Base 312.50 /2) | Final:   0.30 (Raw:   6.04) | H_Count: 1 (Mask 0x02) | DomBin   80 | Pen: [NO_ODD:x0.05] 
+   Rank # 9: Cand 485.68 Hz (Base 1457.03 /3) | Final:   0.24 (Raw:   1.20) | H_Count: 1 (Mask 0x04) | DomBin  373 | Pen: [NO_M1:x0.20] 
+   Rank #10: Cand 728.52 Hz (Base 1457.03 /2) | Final:   0.14 (Raw:   2.82) | H_Count: 2 (Mask 0x22) | DomBin  373 | Pen: [NO_ODD:x0.05] 
+--- [E2 (82.4 Hz) vs E3 (164.8 Hz) COMPARISON] ---
+   [E2 CANDIDATE]: Freq:  78.12 Hz (from 312.50/4) | Raw:   4.27 | Final:   0.02 | H_Count: 1 | Mask: 0x08 | Penalties: [NO_ODD:x0.05] [BASS_GUARD:x0.10] 
+      m=1: Target k=20 | Peak bin=19 ( 74.22 Hz) | f0/1= 75.84 Hz | Mag= 4.08 | Floor= 2.62 | Prom= 1.6x (SNR  +3.8dB) | LP:YES | PassGate:FAIL
+      m=2: Target k=40 | Peak bin=42 (164.06 Hz) | f0/2= 83.01 Hz | Mag= 2.87 | Floor= 3.31 | Prom= 0.9x (SNR  -1.2dB) | LP:NO | PassGate:FAIL
+      m=3: Target k=60 | Peak bin=62 (242.19 Hz) | f0/3= 81.38 Hz | Mag= 8.32 | Floor= 6.01 | Prom= 1.4x (SNR  +2.8dB) | LP:NO | PassGate:FAIL
+      m=4: Target k=80 | Peak bin=80 (312.50 Hz) | f0/4= 78.48 Hz | Mag=31.82 | Floor= 8.96 | Prom= 3.6x (SNR +11.0dB) | LP:YES | PassGate:PASS
+   [E3 CANDIDATE]: Freq: 165.36 Hz (from 496.09/3) | Raw:   1.76 | Final:   0.35 | H_Count: 1 | Mask: 0x04 | Penalties: [NO_M1:x0.20] 
+      m=1: Target k=42 | Peak bin=44 (171.88 Hz) | f0/1=169.92 Hz | Mag= 3.31 | Floor= 3.22 | Prom= 1.0x (SNR  +0.2dB) | LP:NO | PassGate:FAIL
+      m=2: Target k=85 | Peak bin=83 (324.22 Hz) | f0/2=163.09 Hz | Mag=13.96 | Floor= 9.25 | Prom= 1.5x (SNR  +3.6dB) | LP:NO | PassGate:FAIL
+      m=3: Target k=127 | Peak bin=127 (496.09 Hz) | f0/3=164.76 Hz | Mag= 6.30 | Floor= 2.66 | Prom= 2.4x (SNR  +7.5dB) | LP:YES | PassGate:PASS
+      m=4: Target k=169 | Peak bin=171 (667.97 Hz) | f0/4=167.48 Hz | Mag= 3.57 | Floor= 2.27 | Prom= 1.6x (SNR  +3.9dB) | LP:NO | PassGate:FAIL
+   >>> VERDICT: E3 BEAT E2 by score (E3: 0.35 vs E2: 0.02). Diff = 0.33
+D. Final Decision:
+   Best Hyp Freq   : 312.500 Hz
+   Estimator Mode  : INVALID
+   Raw f0          :   0.000 Hz
+   Smooth f0       :   0.000 Hz (is_stable: NO)
+   Final Frequency :   0.000 Hz
+   Final Note      : N/A (MIDI 0, Target 0.00 Hz)
+   Cents Error     : +0.00 cents
+   Confidence      :   0.0%
+   DSP Latency     : 23.69 ms
+================================================================
+
+[FRAME #311 | NO_SIGNAL] Listening... Max Peak: 312.50 Hz (Bin   80, Mag: 31.82)
+
+==================== [E2-DIAG FRAME #312] ====================
+RMS Energy Norm : 0.168274 (Gate >= 0.0020) | State: NO_SIGNAL
+A. Top 5 Spectral Peaks:
+   #1: Bin   90 | Raw:  351.56 Hz | Interp:  350.94 Hz | Mag:  39.53 | Floor: 13.04 | Prom:   3.0x | SNR:  +9.6 dB
+   #2: Bin   81 | Raw:  316.41 Hz | Interp:  314.87 Hz | Mag:  31.14 | Floor: 15.21 | Prom:   2.0x | SNR:  +6.2 dB
+   #3: Bin   62 | Raw:  242.19 Hz | Interp:  240.61 Hz | Mag:  26.11 | Floor: 11.28 | Prom:   2.3x | SNR:  +7.3 dB
+   #4: Bin  261 | Raw: 1019.53 Hz | Interp: 1019.02 Hz | Mag:  24.31 | Floor:  7.26 | Prom:   3.4x | SNR: +10.5 dB
+   #5: Bin  274 | Raw: 1070.31 Hz | Interp: 1070.84 Hz | Mag:  15.13 | Floor:  6.53 | Prom:   2.3x | SNR:  +7.3 dB
+B. Selected Hypothesis Harmonics (best_hyp = 246.09 Hz):
+   m=1: Target:  246.09 Hz (Bin   63) | Peak:  242.19 Hz (Bin   62) | f0/1:  240.61 Hz | Mag: 26.11 | Prom:  2.3x (SNR  +7.3 dB) | Gate: FAIL
+   m=2: Target:  492.19 Hz (Bin  126) | Peak:  492.19 Hz (Bin  126) | f0/2:  246.67 Hz | Mag: 14.87 | Prom:  3.5x (SNR +10.9 dB) | Gate: FAIL
+   m=3: Target:  738.28 Hz (Bin  189) | Peak:  742.19 Hz (Bin  190) | f0/3:  246.95 Hz | Mag:  7.10 | Prom:  2.2x (SNR  +6.9 dB) | Gate: FAIL
+   m=4: Target:  984.38 Hz (Bin  252) | Peak:    0.00 Hz (Bin    0) | f0/4:    0.00 Hz | Mag:  0.00 | Prom:  0.0x (SNR  +0.0 dB) | Gate: FAIL
+C. Candidate Scoring Ranking (Total Tested: 16):
+   Rank # 1: Cand 246.09 Hz (Base 492.19 /2) | Final:  21.66 (Raw:  21.66) | H_Count: 3 (Mask 0x07) | DomBin   62 | Pen: 
+   Rank # 2: Cand 117.19 Hz (Base 351.56 /3) | Final:  18.13 (Raw:  21.33) | H_Count: 3 (Mask 0x0E) | DomBin   90 | Pen: [M1_RESCUED:x0.85] 
+   Rank # 3: Cand 242.19 Hz (Base 242.19 /1) | Final:  14.33 (Raw:  14.33) | H_Count: 2 (Mask 0x03) | DomBin   62 | Pen: 
+   Rank # 4: Cand 234.38 Hz (Base 468.75 /2) | Final:  13.44 (Raw:  13.44) | H_Count: 2 (Mask 0x03) | DomBin   62 | Pen: 
+   Rank # 5: Cand 492.19 Hz (Base 492.19 /1) | Final:   9.66 (Raw:   9.66) | H_Count: 2 (Mask 0x11) | DomBin  126 | Pen: 
+   Rank # 6: Cand 351.56 Hz (Base 351.56 /1) | Final:   8.77 (Raw:   8.77) | H_Count: 1 (Mask 0x01) | DomBin   90 | Pen: 
+   Rank # 7: Cand 468.75 Hz (Base 468.75 /1) | Final:   4.92 (Raw:   4.92) | H_Count: 1 (Mask 0x01) | DomBin  120 | Pen: 
+   Rank # 8: Cand 164.06 Hz (Base 492.19 /3) | Final:   1.45 (Raw:   7.23) | H_Count: 2 (Mask 0x14) | DomBin  126 | Pen: [NO_M1:x0.20] 
+   Rank # 9: Cand 156.25 Hz (Base 468.75 /3) | Final:   0.57 (Raw:   2.84) | H_Count: 1 (Mask 0x04) | DomBin  120 | Pen: [NO_M1:x0.20] 
+   Rank #10: Cand 158.20 Hz (Base 316.41 /2) | Final:   0.57 (Raw:   2.84) | H_Count: 1 (Mask 0x04) | DomBin  120 | Pen: [NO_M1:x0.20] 
+--- [E2 (82.4 Hz) vs E3 (164.8 Hz) COMPARISON] ---
+   [E2 CANDIDATE]: Freq:  80.73 Hz (from 242.19/3) | Raw:   8.27 | Final:   0.17 | H_Count: 2 | Mask: 0x24 | Penalties: [NO_M1:x0.20] [BASS_GUARD:x0.10] 
+      m=1: Target k=21 | Peak bin=20 ( 78.12 Hz) | f0/1= 77.46 Hz | Mag=18.99 | Floor=10.48 | Prom= 1.8x (SNR  +5.2dB) | LP:YES | PassGate:FAIL
+      m=2: Target k=41 | Peak bin=39 (152.34 Hz) | f0/2= 75.95 Hz | Mag=20.19 | Floor=13.06 | Prom= 1.5x (SNR  +3.8dB) | LP:YES | PassGate:FAIL
+      m=3: Target k=62 | Peak bin=62 (242.19 Hz) | f0/3= 80.20 Hz | Mag=26.11 | Floor=11.28 | Prom= 2.3x (SNR  +7.3dB) | LP:YES | PassGate:PASS
+      m=4: Target k=83 | Peak bin=81 (316.41 Hz) | f0/4= 78.72 Hz | Mag=31.14 | Floor=15.21 | Prom= 2.0x (SNR  +6.2dB) | LP:YES | PassGate:FAIL
+   [E3 CANDIDATE]: Freq: 164.06 Hz (from 492.19/3) | Raw:   7.23 | Final:   1.45 | H_Count: 2 | Mask: 0x14 | Penalties: [NO_M1:x0.20] 
+      m=1: Target k=42 | Peak bin=40 (156.25 Hz) | f0/1=154.30 Hz | Mag=18.05 | Floor=13.06 | Prom= 1.4x (SNR  +2.8dB) | LP:NO | PassGate:FAIL
+      m=2: Target k=84 | Peak bin=82 (320.31 Hz) | f0/2=161.13 Hz | Mag=17.58 | Floor=14.82 | Prom= 1.2x (SNR  +1.5dB) | LP:NO | PassGate:FAIL
+      m=3: Target k=126 | Peak bin=126 (492.19 Hz) | f0/3=164.45 Hz | Mag=14.87 | Floor= 4.23 | Prom= 3.5x (SNR +10.9dB) | LP:YES | PassGate:PASS
+      m=4: Target k=168 | Peak bin=169 (660.16 Hz) | f0/4=165.08 Hz | Mag= 7.50 | Floor= 5.83 | Prom= 1.3x (SNR  +2.2dB) | LP:YES | PassGate:FAIL
+   >>> VERDICT: E3 BEAT E2 by score (E3: 1.45 vs E2: 0.17). Diff = 1.28
+D. Final Decision:
+   Best Hyp Freq   : 246.094 Hz
+   Estimator Mode  : INVALID
+   Raw f0          :   0.000 Hz
+   Smooth f0       :   0.000 Hz (is_stable: NO)
+   Final Frequency :   0.000 Hz
+   Final Note      : N/A (MIDI 0, Target 0.00 Hz)
+   Cents Error     : +0.00 cents
+   Confidence      :   0.0%
+   DSP Latency     : 22.13 ms
+================================================================
+
+[FRAME #312 | NO_SIGNAL] Listening... Max Peak: 351.56 Hz (Bin   90, Mag: 39.53)
+
+==================== [E2-DIAG FRAME #313] ====================
+RMS Energy Norm : 0.043991 (Gate >= 0.0020) | State: NO_SIGNAL
+A. Top 5 Spectral Peaks:
+   #1: Bin   50 | Raw:  195.31 Hz | Interp:  195.26 Hz | Mag:   9.87 | Floor:  2.43 | Prom:   4.1x | SNR: +12.2 dB
+   #2: Bin   23 | Raw:   89.84 Hz | Interp:   89.10 Hz | Mag:   9.82 | Floor:  3.14 | Prom:   3.1x | SNR:  +9.9 dB
+   #3: Bin  104 | Raw:  406.25 Hz | Interp:  405.48 Hz | Mag:   3.35 | Floor:  1.14 | Prom:   2.9x | SNR:  +9.4 dB
+   #4: Bin   78 | Raw:  304.69 Hz | Interp:  303.53 Hz | Mag:   2.64 | Floor:  1.11 | Prom:   2.4x | SNR:  +7.5 dB
+   #5: Bin  169 | Raw:  660.16 Hz | Interp:  659.21 Hz | Mag:   2.61 | Floor:  1.01 | Prom:   2.6x | SNR:  +8.3 dB
+B. Selected Hypothesis Harmonics (best_hyp = 203.12 Hz):
+   m=1: Target:  203.12 Hz (Bin   52) | Peak:    0.00 Hz (Bin    0) | f0/1:    0.00 Hz | Mag:  0.00 | Prom:  0.0x (SNR  +0.0 dB) | Gate: FAIL
+   m=2: Target:  406.25 Hz (Bin  104) | Peak:  406.25 Hz (Bin  104) | f0/2:  202.74 Hz | Mag:  3.35 | Prom:  2.9x (SNR  +9.4 dB) | Gate: FAIL
+   m=3: Target:  609.38 Hz (Bin  156) | Peak:  613.28 Hz (Bin  157) | f0/3:  204.04 Hz | Mag:  2.42 | Prom:  1.8x (SNR  +5.3 dB) | Gate: FAIL
+   m=4: Target:  812.50 Hz (Bin  208) | Peak:  808.59 Hz (Bin  207) | f0/4:  201.68 Hz | Mag:  1.42 | Prom:  1.9x (SNR  +5.8 dB) | Gate: FAIL
+C. Candidate Scoring Ranking (Total Tested: 16):
+   Rank # 1: Cand 203.12 Hz (Base 406.25 /2) | Final:  13.92 (Raw:  13.92) | H_Count: 3 (Mask 0x13) | DomBin   50 | Pen: 
+   Rank # 2: Cand 195.31 Hz (Base 195.31 /1) | Final:   8.02 (Raw:   8.02) | H_Count: 2 (Mask 0x21) | DomBin   50 | Pen: 
+   Rank # 3: Cand 406.25 Hz (Base 406.25 /1) | Final:   2.51 (Raw:   2.51) | H_Count: 1 (Mask 0x01) | DomBin  104 | Pen: 
+   Rank # 4: Cand 304.69 Hz (Base 304.69 /1) | Final:   1.98 (Raw:   1.98) | H_Count: 1 (Mask 0x01) | DomBin   78 | Pen: 
+   Rank # 5: Cand  97.66 Hz (Base 195.31 /2) | Final:   1.13 (Raw:  11.26) | H_Count: 2 (Mask 0x03) | DomBin   50 | Pen: [BASS_GUARD_k<28:x0.10] 
+   Rank # 6: Cand 101.56 Hz (Base 304.69 /3) | Final:   0.92 (Raw:  10.81) | H_Count: 3 (Mask 0x0E) | DomBin   50 | Pen: [M1_RESCUED:x0.85] [BASS_GUARD_k<28:x0.10] 
+   Rank # 7: Cand 166.02 Hz (Base 332.03 /2) | Final:   0.45 (Raw:   2.26) | H_Count: 2 (Mask 0x18) | DomBin  169 | Pen: [NO_M1:x0.20] 
+   Rank # 8: Cand  89.84 Hz (Base  89.84 /1) | Final:   0.44 (Raw:   4.44) | H_Count: 1 (Mask 0x01) | DomBin   23 | Pen: [BASS_GUARD_k<28:x0.10] 
+   Rank # 9: Cand 135.42 Hz (Base 406.25 /3) | Final:   0.29 (Raw:   1.45) | H_Count: 1 (Mask 0x04) | DomBin  104 | Pen: [NO_M1:x0.20] 
+   Rank #10: Cand 332.03 Hz (Base 332.03 /1) | Final:   0.07 (Raw:   1.46) | H_Count: 1 (Mask 0x02) | DomBin  169 | Pen: [NO_ODD:x0.05] 
+--- [E2 (82.4 Hz) vs E3 (164.8 Hz) COMPARISON] ---
+   [E2 CANDIDATE]: Freq:  89.84 Hz (from  89.84/1) | Raw:   4.44 | Final:   0.44 | H_Count: 1 | Mask: 0x01 | Penalties: [BASS_GUARD:x0.10] 
+      m=1: Target k=23 | Peak bin=23 ( 89.84 Hz) | f0/1= 89.10 Hz | Mag= 9.82 | Floor= 3.14 | Prom= 3.1x (SNR  +9.9dB) | LP:YES | PassGate:PASS
+      m=2: Target k=46 | Peak bin=48 (187.50 Hz) | f0/2= 94.73 Hz | Mag= 6.93 | Floor= 2.43 | Prom= 2.9x (SNR  +9.1dB) | LP:NO | PassGate:FAIL
+      m=3: Target k=69 | Peak bin=69 (269.53 Hz) | f0/3= 89.52 Hz | Mag= 2.33 | Floor= 1.22 | Prom= 1.9x (SNR  +5.6dB) | LP:YES | PassGate:FAIL
+      m=4: Target k=92 | Peak bin=90 (351.56 Hz) | f0/4= 88.16 Hz | Mag= 1.84 | Floor= 1.22 | Prom= 1.5x (SNR  +3.5dB) | LP:YES | PassGate:FAIL
+   [E3 CANDIDATE]: Freq: 166.02 Hz (from 332.03/2) | Raw:   2.26 | Final:   0.45 | H_Count: 2 | Mask: 0x18 | Penalties: [NO_M1:x0.20] 
+      m=1: Target k=43 | Peak bin=45 (175.78 Hz) | f0/1=173.83 Hz | Mag= 3.27 | Floor= 2.72 | Prom= 1.2x (SNR  +1.6dB) | LP:NO | PassGate:FAIL
+      m=2: Target k=85 | Peak bin=85 (332.03 Hz) | f0/2=165.80 Hz | Mag= 2.28 | Floor= 1.11 | Prom= 2.1x (SNR  +6.2dB) | LP:YES | PassGate:FAIL
+      m=3: Target k=128 | Peak bin=128 (500.00 Hz) | f0/3=166.57 Hz | Mag= 1.39 | Floor= 0.69 | Prom= 2.0x (SNR  +6.2dB) | LP:YES | PassGate:FAIL
+      m=4: Target k=170 | Peak bin=169 (660.16 Hz) | f0/4=164.80 Hz | Mag= 2.61 | Floor= 1.01 | Prom= 2.6x (SNR  +8.3dB) | LP:YES | PassGate:PASS
+   >>> VERDICT: E3 BEAT E2 by score (E3: 0.45 vs E2: 0.44). Diff = 0.01
+D. Final Decision:
+   Best Hyp Freq   : 203.125 Hz
+   Estimator Mode  : INVALID
+   Raw f0          :   0.000 Hz
+   Smooth f0       :   0.000 Hz (is_stable: NO)
+   Final Frequency :   0.000 Hz
+   Final Note      : N/A (MIDI 0, Target 0.00 Hz)
+   Cents Error     : +0.00 cents
+   Confidence      :   0.0%
+   DSP Latency     : 25.05 ms
+================================================================
+
+[FRAME #313 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag: 10.05)
+[FRAME #318 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.10)
+[FRAME #322 | NO_SIGNAL] Listening... Max Peak: 105.47 Hz (Bin   27, Mag:  2.58)
+[FRAME #326 | NO_SIGNAL] Listening... Max Peak:  58.59 Hz (Bin   15, Mag:  2.37)
+[FRAME #330 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.53)
+[FRAME #334 | NO_SIGNAL] Listening... Max Peak:  42.97 Hz (Bin   11, Mag:  3.40)
+[FRAME #338 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.22)
+[FRAME #342 | NO_SIGNAL] Listening... Max Peak:  39.06 Hz (Bin   10, Mag:  4.10)
+[FRAME #346 | NO_SIGNAL] Listening... Max Peak:  31.25 Hz (Bin    8, Mag:  2.21)
+[FRAME #350 | NO_SIGNAL] Listening... Max Peak: 847.66 Hz (Bin  217, Mag:  2.14)
+[FRAME #354 | NO_SIGNAL] Listening... Max Peak:  39.06 Hz (Bin   10, Mag:  4.04)
+[FRAME #358 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.15)
+[FRAME #362 | NO_SIGNAL] Listening... Max Peak:  31.25 Hz (Bin    8, Mag:  2.22)
+[FRAME #366 | NO_SIGNAL] Listening... Max Peak:  31.25 Hz (Bin    8, Mag:  2.31)
+[FRAME #370 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  1.91)
+[FRAME #374 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  2.74)
+[FRAME #378 | NO_SIGNAL] Listening... Max Peak:  39.06 Hz (Bin   10, Mag:  2.69)
+[FRAME #382 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  2.31)
+[FRAME #386 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.07)
+[FRAME #390 | NO_SIGNAL] Listening... Max Peak:  39.06 Hz (Bin   10, Mag:  2.40)
+[FRAME #394 | NO_SIGNAL] Listening... Max Peak:  42.97 Hz (Bin   11, Mag:  2.03)
+[FRAME #398 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.03)
+[FRAME #402 | NO_SIGNAL] Listening... Max Peak:  27.34 Hz (Bin    7, Mag:  3.40)
+[FRAME #406 | NO_SIGNAL] Listening... Max Peak:  31.25 Hz (Bin    8, Mag:  3.54)
+[FRAME #410 | NO_SIGNAL] Listening... Max Peak:  39.06 Hz (Bin   10, Mag:  2.29)
+[FRAME #414 | NO_SIGNAL] Listening... Max Peak:  46.88 Hz (Bin   12, Mag:  2.31)
+[FRAME #418 | NO_SIGNAL] Listening... Max Peak:  39.06 Hz (Bin   10, Mag:  2.83)
+[FRAME #422 | NO_SIGNAL] Listening... Max Peak:  31.25 Hz (Bin    8, Mag:  1.48)

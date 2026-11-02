@@ -1,0 +1,13 @@
+Created At: 2026-10-06T10:54:05+07:00
+Completed At: 2026-10-06T10:54:05+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/CMakeLists.txt`
+Total Lines: 5
+Total Bytes: 255
+Showing lines 1 to 5
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: idf_component_register(SRCS "main.c"
+2:                     INCLUDE_DIRS "."
+3:                     EMBED_TXTFILES "index.html"
+4:                     REQUIRES esp_http_server esp_wifi nvs_flash esp_netif esp_event driver esp_driver_i2s esp_driver_gpio esp_timer)
+5: 
+The above content shows the entire, complete file contents of the requested file.

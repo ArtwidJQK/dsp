@@ -1,0 +1,49 @@
+Created At: 2026-10-06T00:07:47+07:00
+Completed At: 2026-10-06T00:07:47+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/main.c`
+Total Lines: 1600
+Total Bytes: 71565
+Showing lines 225 to 265
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+225: 
+226: // Đo sàn nhiễu cục bộ bằng trung vị 24 bin lân cận (loại trừ búp sóng chính +/- 2 bin)
+227: static float calculate_local_noise_floor(const float *mag, int bin, int num_bins)
+228: {
+229:     float neighbors[24];
+230:     int count = 0;
+231: 
+232:     int left_start = (bin - 12 < PIANO_MIN_BIN) ? PIANO_MIN_BIN : bin - 12;
+233:     int left_end   = bin - 3;
+234:     for (int k = left_start; k <= left_end && count < 24; k++) {
+235:         neighbors[count++] = mag[k];
+236:     }
+237: 
+238:     int right_start = bin + 3;
+239:     int right_end   = (bin + 12 >= num_bins) ? num_bins - 1 : bin + 12;
+240:     for (int k = right_start; k <= right_end && count < 24; k++) {
+241:         neighbors[count++] = mag[k];
+242:     }
+243: 
+244:     if (count == 0) return 0.2f;
+245: 
+246:     // Sắp xếp chèn tìm trung vị
+247:     for (int i = 1; i < count; i++) {
+248:         float val = neighbors[i];
+249:         int j = i - 1;
+250:         while (j >= 0 && neighbors[j] > val) {
+251:             neighbors[j + 1] = neighbors[j];
+252:             j--;
+253:         }
+254:         neighbors[j + 1] = val;
+255:     }
+256: 
+257:     float median = neighbors[count / 2];
+258:     if (median < 0.05f) median = 0.05f;
+259:     return median;
+260: }
+261: 
+262: // ==============================================================================
+263: // 4. ĐÁNH GIÁ TÍNH NHẤT QUÁN HỌA ÂM (SUBHARMONIC HYPOTHESIS SCORING)
+264: // ==============================================================================
+265: typedef struct {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

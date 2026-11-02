@@ -1,0 +1,234 @@
+Created At: 2026-10-06T00:06:13+07:00
+Completed At: 2026-10-06T00:06:13+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/main.c`
+Total Lines: 1600
+Total Bytes: 71565
+Showing lines 225 to 450
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+225: 
+226: // Đo sàn nhiễu cục bộ bằng trung vị 24 bin lân cận (loại trừ búp sóng chính +/- 2 bin)
+227: static float calculate_local_noise_floor(const float *mag, int bin, int num_bins)
+228: {
+229:     float neighbors[24];
+230:     int count = 0;
+231: 
+232:     int left_start = (bin - 12 < PIANO_MIN_BIN) ? PIANO_MIN_BIN : bin - 12;
+233:     int left_end   = bin - 3;
+234:     for (int k = left_start; k <= left_end && count < 24; k++) {
+235:         neighbors[count++] = mag[k];
+236:     }
+237: 
+238:     int right_start = bin + 3;
+239:     int right_end   = (bin + 12 >= num_bins) ? num_bins - 1 : bin + 12;
+240:     for (int k = right_start; k <= right_end && count < 24; k++) {
+241:         neighbors[count++] = mag[k];
+242:     }
+243: 
+244:     if (count == 0) return 0.2f;
+245: 
+246:     // Sắp xếp chèn tìm trung vị
+247:     for (int i = 1; i < count; i++) {
+248:         float val = neighbors[i];
+249:         int j = i - 1;
+250:         while (j >= 0 && neighbors[j] > val) {
+251:             neighbors[j + 1] = neighbors[j];
+252:             j--;
+253:         }
+254:         neighbors[j + 1] = val;
+255:     }
+256: 
+257:     float median = neighbors[count / 2];
+258:     if (median < 0.05f) median = 0.05f;
+259:     return median;
+260: }
+261: 
+262: // ==============================================================================
+263: // 4. ĐÁNH GIÁ TÍNH NHẤT QUÁN HỌA ÂM (SUBHARMONIC HYPOTHESIS SCORING)
+264: // ==============================================================================
+265: typedef struct {
+266:     int   target_k;
+267:     int   peak_w;
+268:     float peak_freq;
+269:     float interp_f0;
+270:     float mag;
+271:     float local_floor;
+272:     float prom;
+273:     float snr_db;
+274:     bool  is_local_peak;
+275:     bool  pass_gate;
+276: } diag_harm_info_t;
+277: 
+278: typedef struct {
+279:     float base_f;
+280:     int   divisor;
+281:     float test_f;
+282:     float raw_score;
+283:     float final_score;
+284:     int   h_count;
+285:     uint8_t h_mask;
+286:     int   dominant_bin;
+287:     bool  penalty_no_odd;
+288:     bool  penalty_missing_m1;
+289:     bool  penalty_missing_m1_rescued;
+290:     bool  penalty_bass_guard;
+291:     diag_harm_info_t harms[4];
+292: } diag_hypothesis_t;
+293: 
+294: static float evaluate_harmonic_hypothesis(const float *magnitude, int num_bins, float hyp_f, 
+295:                                           int *out_h_count, uint8_t *out_h_mask, int *out_dominant_bin,
+296:                                           diag_hypothesis_t *diag_out)
+297: {
+298:     if (diag_out) {
+299:         memset(diag_out, 0, sizeof(diag_hypothesis_t));
+300:         diag_out->test_f = hyp_f;
+301:     }
+302: 
+303:     if (hyp_f < PIANO_MIN_FREQ_HZ || hyp_f > PIANO_MAX_FREQ_HZ) {
+304:         if (out_h_count) *out_h_count = 0;
+305:         if (out_h_mask) *out_h_mask = 0;
+306:         if (out_dominant_bin) *out_dominant_bin = 0;
+307:         return 0.0f;
+308:     }
+309: 
+310:     float hyp_k = hyp_f / BIN_RESOLUTION_HZ;
+311:     int h_count = 0;
+312:     uint8_t h_mask = 0;
+313:     float total_energy = 0.0f;
+314:     float max_found_mag = 0.0f;
+315:     int dominant_bin = (int)roundf(hyp_k);
+316: 
+317:     for (int m = 1; m <= 6; m++) {
+318:         int target_k = (int)roundf((float)m * hyp_k);
+319:         if (target_k >= num_bins - 2) break;
+320: 
+321:         int w_start = (target_k - 2 < 1) ? 1 : target_k - 2;
+322:         int w_end   = (target_k + 2 >= num_bins - 1) ? num_bins - 2 : target_k + 2;
+323: 
+324:         int peak_w = w_start;
+325:         float max_v = magnitude[w_start];
+326:         for (int w = w_start + 1; w <= w_end; w++) {
+327:             if (magnitude[w] > max_v) {
+328:                 max_v = magnitude[w];
+329:                 peak_w = w;
+330:             }
+331:         }
+332: 
+333:         bool is_local_peak = (peak_w > 0 && peak_w < num_bins - 1 &&
+334:                               magnitude[peak_w] >= magnitude[peak_w - 1] &&
+335:                               magnitude[peak_w] >= magnitude[peak_w + 1]);
+336: 
+337:         float local_floor = calculate_local_noise_floor(magnitude, peak_w, num_bins);
+338:         float prom = max_v / (local_floor > 0.05f ? local_floor : 0.05f);
+339: 
+340:         // Họa âm được công nhận nếu là đỉnh cục bộ có độ nhô >= 2.2x và biên độ >= 1.0
+341:         bool pass_gate = (is_local_peak && prom >= 2.2f && max_v >= 1.0f);
+342:         if (pass_gate) {
+343:             h_count++;
+344:             h_mask |= (1 << (m - 1));
+345:             total_energy += (1.0f / sqrtf((float)m)) * log1pf(prom) * sqrtf(max_v);
+346:             if (max_v > max_found_mag) {
+347:                 max_found_mag = max_v;
+348:                 dominant_bin = peak_w;
+349:             }
+350:         }
+351: 
+352:         if (diag_out && m <= 4) {
+353:             int idx = m - 1;
+354:             diag_out->harms[idx].target_k = target_k;
+355:             diag_out->harms[idx].peak_w = peak_w;
+356:             diag_out->harms[idx].peak_freq = (float)peak_w * BIN_RESOLUTION_HZ;
+357:             diag_out->harms[idx].mag = max_v;
+358:             diag_out->harms[idx].local_floor = local_floor;
+359:             diag_out->harms[idx].prom = prom;
+360:             diag_out->harms[idx].snr_db = 20.0f * log10f(prom > 0.1f ? prom : 0.1f);
+361:             diag_out->harms[idx].is_local_peak = is_local_peak;
+362:             diag_out->harms[idx].pass_gate = pass_gate;
+363: 
+364:             if (peak_w > 0 && peak_w < num_bins - 1) {
+365:                 float alpha = magnitude[peak_w - 1];
+366:                 float beta  = magnitude[peak_w];
+367:                 float gamma = magnitude[peak_w + 1];
+368:                 float denom = alpha - 2.0f * beta + gamma;
+369:                 float p = (fabsf(denom) > 1e-6f) ? 0.5f * (alpha - gamma) / denom : 0.0f;
+370:                 if (p < -0.5f) p = -0.5f;
+371:                 if (p >  0.5f) p =  0.5f;
+372:                 diag_out->harms[idx].interp_f0 = (((float)peak_w + p) * BIN_RESOLUTION_HZ) / (float)m;
+373:             } else {
+374:                 diag_out->harms[idx].interp_f0 = ((float)peak_w * BIN_RESOLUTION_HZ) / (float)m;
+375:             }
+376:         }
+377:     }
+378: 
+379:     if (h_count == 0) {
+380:         if (out_h_count) *out_h_count = 0;
+381:         if (out_h_mask) *out_h_mask = 0;
+382:         if (out_dominant_bin) *out_dominant_bin = dominant_bin;
+383:         if (diag_out) {
+384:             diag_out->h_count = 0;
+385:             diag_out->h_mask = 0;
+386:             diag_out->raw_score = 0.0f;
+387:             diag_out->final_score = 0.0f;
+388:         }
+389:         return 0.0f;
+390:     }
+391: 
+392:     // 1. Điểm số cơ sở từ năng lượng họa âm và tính nhất quán
+393:     float raw_score = total_energy * (1.0f + 0.40f * (float)(h_count - 1));
+394:     float score = raw_score;
+395: 
+396:     bool pen_no_odd = false;
+397:     bool pen_missing_m1 = false;
+398:     bool pen_missing_m1_rescued = false;
+399:     bool pen_bass_guard = false;
+400: 
+401:     // 2. Chống ảo ảnh Octave-down (Subharmonic phantom):
+402:     bool has_odd = (h_mask & 0x15) != 0; // bit 0 (m=1), bit 2 (m=3), bit 4 (m=5) -> 0x01 | 0x04 | 0x10 = 0x15
+403:     if (!has_odd) {
+404:         score *= 0.05f; // Phạt nặng nếu hoàn toàn vắng bóng họa âm lẻ
+405:         pen_no_odd = true;
+406:     } else {
+407:         // Nếu m=1 vắng mặt nhưng có cả m=2 và m=3: Nốt piano bị suy giảm tần số cơ bản do loa nhỏ
+408:         if ((h_mask & 0x01) == 0) {
+409:             if ((h_mask & 0x02) != 0 && (h_mask & 0x04) != 0) {
+410:                 score *= 0.85f; // Có m=2 và m=3: Bằng chứng rất mạnh cho nốt thật
+411:                 pen_missing_m1_rescued = true;
+412:             } else {
+413:                 score *= 0.20f;
+414:                 pen_missing_m1 = true;
+415:             }
+416:         }
+417:     }
+418: 
+419:     // 3. Xử lý dải hạ âm (< 110 Hz, k < 28) tránh nhiễu điện lưới 50Hz/100Hz:
+420:     if (hyp_k < 28.0f) {
+421:         if (h_count < 3 || max_found_mag < 14.0f) {
+422:             score *= 0.10f;
+423:             pen_bass_guard = true;
+424:         }
+425:     }
+426: 
+427:     if (diag_out) {
+428:         diag_out->raw_score = raw_score;
+429:         diag_out->final_score = score;
+430:         diag_out->h_count = h_count;
+431:         diag_out->h_mask = h_mask;
+432:         diag_out->dominant_bin = dominant_bin;
+433:         diag_out->penalty_no_odd = pen_no_odd;
+434:         diag_out->penalty_missing_m1 = pen_missing_m1;
+435:         diag_out->penalty_missing_m1_rescued = pen_missing_m1_rescued;
+436:         diag_out->penalty_bass_guard = pen_bass_guard;
+437:     }
+438: 
+439:     if (out_h_count) *out_h_count = h_count;
+440:     if (out_h_mask)  *out_h_mask  = h_mask;
+441:     if (out_dominant_bin) *out_dominant_bin = dominant_bin;
+442:     return score;
+443: }
+444: 
+445: // ==============================================================================
+446: // 5. LỌC ỔN ĐỊNH THỜI GIAN (TEMPORAL STABILITY & OUTLIER REJECTION)
+447: // ==============================================================================
+448: static float update_temporal_stability(float raw_f0, float confidence, bool is_valid, bool *out_stable)
+449: {
+450:     s_history[s_hist_idx].f0 = raw_f0;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

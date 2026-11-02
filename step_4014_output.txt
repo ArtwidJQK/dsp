@@ -1,0 +1,28 @@
+Created At: 2026-10-06T10:34:07+07:00
+Completed At: 2026-10-06T10:34:07+07:00
+The following changes were made by the replace_file_content tool to: d:\Xử lý tín hiệu số\main\main.c. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -995,9 +995,17 @@
+                 }
+             } else if (best_hyp_freq < 110.0f) {
+                 // Dải nốt trầm piano [55 Hz .. 110 Hz) (C2, D2, E2, F2):
+-                // Cho phép fundamental yếu khi có ít nhất 2 họa âm thực sự được xác thực
+-                // Không bắt buộc fundamental là đỉnh mạnh nhất
+-                if (best_h_count >= 2 && (cand_peak_mag >= 2.0f || sel_prominence >= 2.0f || primary_cand->mag >= 4.0f)) {
++                // Chặn triệt để nhiễu điện lưới 50Hz và họa âm 100Hz:
++                bool is_hum_freq = (best_hyp_freq >= 48.0f && best_hyp_freq <= 52.0f) ||
++                                   (best_hyp_freq >= 98.0f && best_hyp_freq <= 103.0f);
++                if (is_hum_freq) {
++                    if (best_h_count >= 3 && cand_peak_mag >= 14.0f) {
++                        state = PITCH_VALID_PITCH;
++                    } else {
++                        state = PITCH_NO_SIGNAL;
++                    }
++                } else if (raw_ac_rms_norm >= 0.015f && best_h_count >= 2 &&
++                           (cand_peak_mag >= 2.0f || sel_prominence >= 2.0f || primary_cand->mag >= 4.0f)) {
+                     state = PITCH_VALID_PITCH;
+                 } else if (best_h_count >= 2 || cand_peak_mag >= 1.5f) {
+                     state = PITCH_WEAK_SIGNAL;
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.

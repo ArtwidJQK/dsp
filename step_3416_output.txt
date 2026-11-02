@@ -1,0 +1,199 @@
+Created At: 2026-10-06T00:06:19+07:00
+Completed At: 2026-10-06T00:06:19+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/main.c`
+Total Lines: 1600
+Total Bytes: 71565
+Showing lines 830 to 1020
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+830:         int candidate_count = 0;
+831: 
+832:         for (int k = PIANO_MIN_BIN; k <= PIANO_MAX_BIN && candidate_count < MAX_CANDIDATE_PEAKS; k++) {
+833:             if (s_magnitude[k] > s_magnitude[k - 1] && s_magnitude[k] > s_magnitude[k + 1]) {
+834:                 float local_floor = calculate_local_noise_floor(s_magnitude, k, num_bins);
+835:                 float prominence = s_magnitude[k] / (local_floor > 0.05f ? local_floor : 0.05f);
+836:                 float snr_db = 20.0f * log10f(prominence > 0.1f ? prominence : 0.1f);
+837: 
+838:                 // Lưu lại ứng viên nếu có biên độ đáng kể hoặc nhô rõ so với sàn nhiễu
+839:                 if (s_magnitude[k] >= 1.5f && prominence >= 2.0f) {
+840:                     candidates[candidate_count].bin = k;
+841:                     candidates[candidate_count].raw_freq = (float)k * BIN_RESOLUTION_HZ;
+842:                     candidates[candidate_count].mag = s_magnitude[k];
+843:                     candidates[candidate_count].local_floor = local_floor;
+844:                     candidates[candidate_count].prominence = prominence;
+845:                     candidates[candidate_count].snr_db = snr_db;
+846:                     candidates[candidate_count].score = 0.0f;
+847:                     candidates[candidate_count].harmonics_found = 0;
+848:                     candidate_count++;
+849:                 }
+850:             }
+851:         }
+852: 
+853:         // Nếu không có đỉnh nào thỏa mãn, đưa đỉnh lớn nhất vào danh sách xét
+854:         if (candidate_count == 0) {
+855:             float local_floor = calculate_local_noise_floor(s_magnitude, max_mag_bin, num_bins);
+856:             candidates[0].bin = max_mag_bin;
+857:             candidates[0].raw_freq = (float)max_mag_bin * BIN_RESOLUTION_HZ;
+858:             candidates[0].mag = max_mag_in_range;
+859:             candidates[0].local_floor = local_floor;
+860:             candidates[0].prominence = max_mag_in_range / (local_floor > 0.05f ? local_floor : 0.05f);
+861:             candidates[0].snr_db = 20.0f * log10f(candidates[0].prominence > 0.1f ? candidates[0].prominence : 0.1f);
+862:             candidates[0].score = 0.0f;
+863:             candidates[0].harmonics_found = 0;
+864:             candidate_count = 1;
+865:         }
+866: 
+867:         // 7. Thuật toán kiểm định giả thuyết họa âm (Subharmonic Hypothesis Testing)
+868:         // Tìm ứng viên đỉnh mạnh nhất để thử nghiệm các giả thuyết f, f/2, f/3, f/4
+869:         int top_cand_idx = 0;
+870:         float top_cand_mag = candidates[0].mag;
+871:         for (int c = 1; c < candidate_count; c++) {
+872:             if (candidates[c].mag > top_cand_mag) {
+873:                 top_cand_mag = candidates[c].mag;
+874:                 top_cand_idx = c;
+875:             }
+876:         }
+877: 
+878:         peak_candidate_t *primary_cand = &candidates[top_cand_idx];
+879:         float cand_peak_freq = primary_cand->raw_freq;
+880:         int cand_peak_bin = primary_cand->bin;
+881:         float cand_peak_mag = primary_cand->mag;
+882: 
+883:         float best_hyp_freq = cand_peak_freq;
+884:         float best_hyp_score = -1.0f;
+885:         int best_divisor = 1;
+886:         int best_h_count = 0;
+887:         uint8_t best_h_mask = 0;
+888:         int best_dom_bin = cand_peak_bin;
+889: 
+890:         // Lưu điểm số các giả thuyết f, f/2, f/3 cho dòng chẩn đoán
+891:         float diag_f_score = 0.0f;
+892:         float diag_f2_score = 0.0f;
+893:         float diag_f3_score = 0.0f;
+894: 
+895:         // Cấu trúc lưu vết các giả thuyết đã đánh giá để phục vụ [E2-DIAG]
+896:         #define MAX_DIAG_HYPS 24
+897:         static diag_hypothesis_t s_diag_hyps[MAX_DIAG_HYPS];
+898:         int diag_hyp_count = 0;
+899: 
+900:         // Thử nghiệm các giả thuyết subharmonic: f, f/2, f/3, f/4 từ đỉnh mạnh nhất
+901:         for (int d = 1; d <= 4; d++) {
+902:             float test_f = cand_peak_freq / (float)d;
+903:             if (test_f < PIANO_MIN_FREQ_HZ) break;
+904: 
+905:             int h_cnt = 0;
+906:             uint8_t h_msk = 0;
+907:             int dom_b = 0;
+908:             diag_hypothesis_t *d_ptr = (diag_hyp_count < MAX_DIAG_HYPS) ? &s_diag_hyps[diag_hyp_count] : NULL;
+909:             float sc = evaluate_harmonic_hypothesis(s_magnitude, num_bins, test_f, &h_cnt, &h_msk, &dom_b, d_ptr);
+910:             if (d_ptr) {
+911:                 d_ptr->base_f = cand_peak_freq;
+912:                 d_ptr->divisor = d;
+913:                 diag_hyp_count++;
+914:             }
+915: 
+916:             if (d == 1) diag_f_score = sc;
+917:             if (d == 2) diag_f2_score = sc;
+918:             if (d == 3) diag_f3_score = sc;
+919: 
+920:             if (sc > best_hyp_score) {
+921:                 best_hyp_score = sc;
+922:                 best_hyp_freq = test_f;
+923:                 best_divisor = d;
+924:                 best_h_count = h_cnt;
+925:                 best_h_mask = h_msk;
+926:                 best_dom_bin = dom_b;
+927:             }
+928:         }
+929: 
+930:         // Kiểm tra thêm các đỉnh ứng viên tiềm năng khác (tối đa 4 đỉnh tiếp theo)
+931:         for (int c = 0; c < candidate_count && c < 5; c++) {
+932:             if (c == top_cand_idx) continue;
+933:             float other_f = candidates[c].raw_freq;
+934:             for (int d = 1; d <= 3; d++) {
+935:                 float test_f = other_f / (float)d;
+936:                 if (test_f < PIANO_MIN_FREQ_HZ) break;
+937: 
+938:                 int h_cnt = 0;
+939:                 uint8_t h_msk = 0;
+940:                 int dom_b = 0;
+941:                 diag_hypothesis_t *d_ptr = (diag_hyp_count < MAX_DIAG_HYPS) ? &s_diag_hyps[diag_hyp_count] : NULL;
+942:                 float sc = evaluate_harmonic_hypothesis(s_magnitude, num_bins, test_f, &h_cnt, &h_msk, &dom_b, d_ptr);
+943:                 if (d_ptr) {
+944:                     d_ptr->base_f = other_f;
+945:                     d_ptr->divisor = d;
+946:                     diag_hyp_count++;
+947:                 }
+948: 
+949:                 if (sc > best_hyp_score) {
+950:                     best_hyp_score = sc;
+951:                     best_hyp_freq = test_f;
+952:                     best_divisor = d;
+953:                     best_h_count = h_cnt;
+954:                     best_h_mask = h_msk;
+955:                     best_dom_bin = dom_b;
+956:                     cand_peak_freq = candidates[c].raw_freq;
+957:                     cand_peak_bin = candidates[c].bin;
+958:                     cand_peak_mag = candidates[c].mag;
+959:                 }
+960:             }
+961:         }
+962: 
+963:         // 8. Cổng phân loại trạng thái (Signal Gate & Confidence)
+964:         int hyp_target_bin = (int)roundf(best_hyp_freq / BIN_RESOLUTION_HZ);
+965:         if (hyp_target_bin < 1) hyp_target_bin = 1;
+966:         if (hyp_target_bin >= num_bins - 1) hyp_target_bin = num_bins - 2;
+967: 
+968:         float sel_local_floor = calculate_local_noise_floor(s_magnitude, hyp_target_bin, num_bins);
+969:         float sel_mag = s_magnitude[hyp_target_bin];
+970:         float sel_prominence = sel_mag / (sel_local_floor > 0.05f ? sel_local_floor : 0.05f);
+971:         float sel_snr_db = 20.0f * log10f(sel_prominence > 0.1f ? sel_prominence : 0.1f);
+972: 
+973:         pitch_state_t state = PITCH_NO_SIGNAL;
+974:         bool pass_energy_gate = (raw_ac_rms_norm >= MIN_AC_RMS_NORM);
+975: 
+976:         if (pass_energy_gate && best_hyp_score >= 20.0f) {
+977:             if (best_hyp_freq < 110.0f) {
+978:                 // Tần số thấp (< 110 Hz): Phải có ít nhất 3 họa âm liên kết
+979:                 if (best_h_count >= 3 && cand_peak_mag >= 14.0f) {
+980:                     state = PITCH_VALID_PITCH;
+981:                 } else if (best_h_count >= 2 && cand_peak_mag >= 9.0f) {
+982:                     state = PITCH_WEAK_SIGNAL;
+983:                 } else {
+984:                     state = PITCH_NO_SIGNAL;
+985:                 }
+986:             } else {
+987:                 // Tần số >= 110 Hz (bao gồm C4, A4, C5):
+988:                 // Được xác thực VALID_PITCH khi điểm nhất quán họa âm cao hoặc độ nổi bật phổ tốt
+989:                 if ((best_hyp_score >= 120.0f) ||
+990:                     (sel_prominence >= 4.0f && sel_mag >= 1.5f) ||
+991:                     (primary_cand->prominence >= 6.0f && primary_cand->mag >= 2.0f && best_h_count >= 2)) {
+992:                     state = PITCH_VALID_PITCH;
+993:                 } else if (best_hyp_score >= 40.0f || sel_prominence >= 2.5f) {
+994:                     state = PITCH_WEAK_SIGNAL;
+995:                 } else {
+996:                     state = PITCH_NO_SIGNAL;
+997:                 }
+998:             }
+999:         } else {
+1000:             state = PITCH_NO_SIGNAL;
+1001:         }
+1002: 
+1003:         // Tính độ tin cậy [0 .. 100%]
+1004:         float confidence = 0.0f;
+1005:         if (state == PITCH_VALID_PITCH) {
+1006:             confidence = 50.0f + (sel_snr_db - 10.0f) * 1.5f + (best_hyp_score / 20.0f) + (float)(best_h_count - 1) * 8.0f;
+1007:             if (confidence > 100.0f) confidence = 100.0f;
+1008:             if (confidence < 60.0f)  confidence = 60.0f;
+1009:         } else if (state == PITCH_WEAK_SIGNAL) {
+1010:             confidence = 30.0f + (sel_snr_db - 6.0f) * 2.0f;
+1011:             if (confidence > 59.0f) confidence = 59.0f;
+1012:             if (confidence < 25.0f) confidence = 25.0f;
+1013:         } else {
+1014:             confidence = 0.0f;
+1015:         }
+1016: 
+1017:         // 9. Multi-Harmonic Weighted Quadratic Interpolation (MHQI)
+1018:         // Với mỗi họa âm m = 1, 2, 3 của giả thuyết cơ bản best_hyp_freq:
+1019:         //   (a) Tìm local peak thực tế trong khoảng ±1 bin quanh target bin.
+1020:         //   (b) Xác nhận đỉnh cục bộ hợp lệ: mag[k] >= mag[k-1] && mag[k] >= mag[k+1].
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

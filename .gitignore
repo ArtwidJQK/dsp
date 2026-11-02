@@ -1,0 +1,18 @@
+# ESP-IDF / CMake build outputs and temporary files
+build/
+**/build/
+sdkconfig.old
+
+# Python cache & compiled bytecode
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Clang / Language server caches
+.cache/
+**/.cache/
+
+# OS / Temporary files
+*.tmp
+Thumbs.db
+.DS_Store

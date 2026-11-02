@@ -1,0 +1,96 @@
+[
+  {
+    "note": "D3",
+    "target_hz": 146.832,
+    "total_frames": 20,
+    "correct_frames": 16,
+    "correct_rate_pct": 80.0,
+    "octave_errors": 1,
+    "mean_freq": 146.66362500000002,
+    "std_freq": 0.912615280389276,
+    "mae": 0.820999999999998,
+    "max_err": 1.608000000000004,
+    "mean_cents": -2.0218749999999996,
+    "all_notes_detected": [
+      "F2",
+      "G1",
+      "D3",
+      "D2"
+    ]
+  },
+  {
+    "note": "E3",
+    "target_hz": 164.814,
+    "total_frames": 17,
+    "correct_frames": 12,
+    "correct_rate_pct": 70.58823529411765,
+    "octave_errors": 2,
+    "mean_freq": 164.85116666666667,
+    "std_freq": 0.2235981921106492,
+    "mae": 0.18083333333332993,
+    "max_err": 0.3269999999999982,
+    "mean_cents": 0.39333333333333337,
+    "all_notes_detected": [
+      "F#1",
+      "G#1",
+      "E2",
+      "E3"
+    ]
+  },
+  {
+    "note": "C4",
+    "target_hz": 261.626,
+    "total_frames": 19,
+    "correct_frames": 16,
+    "correct_rate_pct": 84.21052631578947,
+    "octave_errors": 0,
+    "mean_freq": 263.08837500000004,
+    "std_freq": 1.9678261398473935,
+    "mae": 1.9108750000000185,
+    "max_err": 3.7250000000000227,
+    "mean_cents": 9.606250000000001,
+    "all_notes_detected": [
+      "C4",
+      "E2",
+      "G#0"
+    ]
+  },
+  {
+    "note": "A4",
+    "target_hz": 440.0,
+    "total_frames": 15,
+    "correct_frames": 10,
+    "correct_rate_pct": 66.66666666666666,
+    "octave_errors": 2,
+    "mean_freq": 438.7715999999999,
+    "std_freq": 1.5636601079944772,
+    "mae": 1.8445999999999914,
+    "max_err": 2.3109999999999786,
+    "mean_cents": -4.849999999999999,
+    "all_notes_detected": [
+      "A3",
+      "G1",
+      "D3",
+      "A4"
+    ]
+  },
+  {
+    "note": "C5",
+    "target_hz": 523.251,
+    "total_frames": 18,
+    "correct_frames": 12,
+    "correct_rate_pct": 66.66666666666666,
+    "octave_errors": 0,
+    "mean_freq": 523.6153333333333,
+    "std_freq": 0.37679348897420617,
+    "mae": 0.3643333333333203,
+    "max_err": 1.1710000000000491,
+    "mean_cents": 1.2033333333333334,
+    "all_notes_detected": [
+      "G#1",
+      "C5",
+      "G#2",
+      "A4"
+    ]
+  }
+]

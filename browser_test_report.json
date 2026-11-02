@@ -1,0 +1,149 @@
+{
+  "all_passed": true,
+  "viewports": [
+    [
+      "Desktop 1920x1080",
+      1920,
+      1080,
+      {
+        "winWidth": 1920,
+        "docWidth": 1920,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Desktop 1366x768",
+      1366,
+      768,
+      {
+        "winWidth": 1366,
+        "docWidth": 1366,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Tablet 1024x768",
+      1024,
+      768,
+      {
+        "winWidth": 1024,
+        "docWidth": 1024,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Tablet 768x1024",
+      768,
+      1024,
+      {
+        "winWidth": 768,
+        "docWidth": 768,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Mobile 412x915",
+      412,
+      915,
+      {
+        "winWidth": 412,
+        "docWidth": 412,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Mobile 390x844",
+      390,
+      844,
+      {
+        "winWidth": 390,
+        "docWidth": 390,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Mobile 360x800",
+      360,
+      800,
+      {
+        "winWidth": 360,
+        "docWidth": 360,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ],
+    [
+      "Landscape 844x390",
+      844,
+      390,
+      {
+        "winWidth": 844,
+        "docWidth": 844,
+        "hasOverflow": false,
+        "cardFits": true,
+        "navFits": true
+      },
+      "PASSED"
+    ]
+  ],
+  "state_a4": {
+    "note": "A4",
+    "freq": "440.10 Hz",
+    "cents": "+0.39 cent",
+    "banner": "\u0110\u00daNG CAO \u0110\u1ed8",
+    "bannerClass": "state-banner in-tune",
+    "needleLeft": 50.3911,
+    "activeKeyNote": "A4",
+    "cardClasses": "tuner-card has-signal is-in-tune"
+  },
+  "state_c4": {
+    "note": "C4",
+    "freq": "259.50 Hz",
+    "cents": "-14.15 cent",
+    "banner": "TH\u1ea4P",
+    "bannerClass": "state-banner too-low",
+    "needleLeft": 35.8677,
+    "activeKeyNote": "C4",
+    "cardClasses": "tuner-card has-signal"
+  },
+  "state_e2": {
+    "note": "E2",
+    "freq": "83.20 Hz",
+    "cents": "+16.52 cent",
+    "banner": "CAO",
+    "bannerClass": "state-banner too-high",
+    "needleLeft": 66.472,
+    "activeKeyNote": "E2",
+    "cardClasses": "tuner-card has-signal"
+  },
+  "state_nosig": {
+    "note": "--",
+    "freq": "-- Hz",
+    "cents": "-- cent",
+    "banner": "KH\u00d4NG C\u00d3 T\u00cdN HI\u1ec6U",
+    "bannerClass": "state-banner",
+    "needleLeft": 52.0532,
+    "activeKeyNote": "none",
+    "cardClasses": "tuner-card"
+  }
+}

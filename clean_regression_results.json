@@ -1,0 +1,887 @@
+[
+  {
+    "note": "A4",
+    "target_hz": 440.0,
+    "total_frames": 20,
+    "correct_frames": 16,
+    "correct_rate_pct": 80.0,
+    "no_signal_frames": 2,
+    "no_signal_rate_pct": 10.0,
+    "octave_errors_count": 2,
+    "mean_freq": 438.340375,
+    "median_freq": 438.46000000000004,
+    "mae": 1.7606249999999974,
+    "max_error": 3.730000000000018,
+    "std_freq": 1.4626140500401965,
+    "frames": [
+      {
+        "frame": 1273,
+        "frequency": 440.202,
+        "note": "A4",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1274,
+        "frequency": 440.202,
+        "note": "A4",
+        "valid": true,
+        "confidence": 84.2,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1275,
+        "frequency": 440.202,
+        "note": "A4",
+        "valid": true,
+        "confidence": 73.6,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1276,
+        "frequency": 440.202,
+        "note": "A4",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1277,
+        "frequency": 439.791,
+        "note": "A4",
+        "valid": true,
+        "confidence": 79.2,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1278,
+        "frequency": 438.071,
+        "note": "A4",
+        "valid": true,
+        "confidence": 80.6,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1279,
+        "frequency": 437.402,
+        "note": "A4",
+        "valid": true,
+        "confidence": 95.9,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1280,
+        "frequency": 218.857,
+        "note": "A3",
+        "valid": true,
+        "confidence": 83.5,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1281,
+        "frequency": 218.866,
+        "note": "A3",
+        "valid": true,
+        "confidence": 69.8,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1282,
+        "frequency": 436.464,
+        "note": "A4",
+        "valid": true,
+        "confidence": 77.2,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1283,
+        "frequency": 436.357,
+        "note": "A4",
+        "valid": true,
+        "confidence": 79.8,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1284,
+        "frequency": 436.27,
+        "note": "A4",
+        "valid": true,
+        "confidence": 81.9,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1285,
+        "frequency": 436.357,
+        "note": "A4",
+        "valid": true,
+        "confidence": 83.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1286,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1287,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F3_FALLBACK"
+      },
+      {
+        "frame": 1288,
+        "frequency": 437.62,
+        "note": "A4",
+        "valid": true,
+        "confidence": 82.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1289,
+        "frequency": 438.849,
+        "note": "A4",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1290,
+        "frequency": 438.849,
+        "note": "A4",
+        "valid": true,
+        "confidence": 84.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1291,
+        "frequency": 438.849,
+        "note": "A4",
+        "valid": true,
+        "confidence": 95.7,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1292,
+        "frequency": 437.759,
+        "note": "A4",
+        "valid": true,
+        "confidence": 88.6,
+        "estimator": "F1_PRIMARY"
+      }
+    ]
+  },
+  {
+    "note": "C4",
+    "target_hz": 261.63,
+    "total_frames": 20,
+    "correct_frames": 18,
+    "correct_rate_pct": 90.0,
+    "no_signal_frames": 2,
+    "no_signal_rate_pct": 10.0,
+    "octave_errors_count": 0,
+    "mean_freq": 262.06361111111113,
+    "median_freq": 262.47749999999996,
+    "mae": 2.170944444444438,
+    "max_error": 4.435999999999979,
+    "std_freq": 2.5545476907509417,
+    "frames": [
+      {
+        "frame": 1298,
+        "frequency": 262.203,
+        "note": "C4",
+        "valid": true,
+        "confidence": 92.2,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1299,
+        "frequency": 265.116,
+        "note": "C4",
+        "valid": true,
+        "confidence": 95.9,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1300,
+        "frequency": 265.116,
+        "note": "C4",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1301,
+        "frequency": 265.116,
+        "note": "C4",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1302,
+        "frequency": 262.539,
+        "note": "C4",
+        "valid": true,
+        "confidence": 60.2,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1303,
+        "frequency": 262.539,
+        "note": "C4",
+        "valid": true,
+        "confidence": 67.3,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1304,
+        "frequency": 262.539,
+        "note": "C4",
+        "valid": true,
+        "confidence": 78.4,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1305,
+        "frequency": 257.258,
+        "note": "C4",
+        "valid": true,
+        "confidence": 60.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1306,
+        "frequency": 257.194,
+        "note": "C4",
+        "valid": true,
+        "confidence": 70.9,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1307,
+        "frequency": 257.258,
+        "note": "C4",
+        "valid": true,
+        "confidence": 85.2,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1308,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1309,
+        "frequency": 260.146,
+        "note": "C4",
+        "valid": true,
+        "confidence": 82.1,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1310,
+        "frequency": 262.303,
+        "note": "C4",
+        "valid": true,
+        "confidence": 63.6,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1311,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1312,
+        "frequency": 260.658,
+        "note": "C4",
+        "valid": true,
+        "confidence": 98.5,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1313,
+        "frequency": 262.303,
+        "note": "C4",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1314,
+        "frequency": 262.416,
+        "note": "C4",
+        "valid": true,
+        "confidence": 96.3,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1315,
+        "frequency": 264.147,
+        "note": "C4",
+        "valid": true,
+        "confidence": 79.2,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1316,
+        "frequency": 264.147,
+        "note": "C4",
+        "valid": true,
+        "confidence": 79.1,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1317,
+        "frequency": 264.147,
+        "note": "C4",
+        "valid": true,
+        "confidence": 89.5,
+        "estimator": "F1_PRIMARY"
+      }
+    ]
+  },
+  {
+    "note": "E3",
+    "target_hz": 164.81,
+    "total_frames": 20,
+    "correct_frames": 17,
+    "correct_rate_pct": 85.0,
+    "no_signal_frames": 3,
+    "no_signal_rate_pct": 15.0,
+    "octave_errors_count": 0,
+    "mean_freq": 165.58911764705883,
+    "median_freq": 165.987,
+    "mae": 0.8649999999999958,
+    "max_error": 1.3170000000000073,
+    "std_freq": 0.5922487436833143,
+    "frames": [
+      {
+        "frame": 1323,
+        "frequency": 165.349,
+        "note": "E3",
+        "valid": true,
+        "confidence": 77.3,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1324,
+        "frequency": 165.349,
+        "note": "E3",
+        "valid": true,
+        "confidence": 94.4,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1325,
+        "frequency": 165.195,
+        "note": "E3",
+        "valid": true,
+        "confidence": 88.9,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1326,
+        "frequency": 165.349,
+        "note": "E3",
+        "valid": true,
+        "confidence": 77.8,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1327,
+        "frequency": 165.195,
+        "note": "E3",
+        "valid": true,
+        "confidence": 93.8,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1328,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 39.2,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1329,
+        "frequency": 166.127,
+        "note": "E3",
+        "valid": true,
+        "confidence": 98.2,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1330,
+        "frequency": 166.127,
+        "note": "E3",
+        "valid": true,
+        "confidence": 90.2,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1331,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1332,
+        "frequency": 165.987,
+        "note": "E3",
+        "valid": true,
+        "confidence": 62.2,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1333,
+        "frequency": 166.104,
+        "note": "E3",
+        "valid": true,
+        "confidence": 78.4,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1334,
+        "frequency": 166.104,
+        "note": "E3",
+        "valid": true,
+        "confidence": 77.3,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1335,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 38.1,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1336,
+        "frequency": 166.117,
+        "note": "E3",
+        "valid": true,
+        "confidence": 85.5,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1337,
+        "frequency": 166.117,
+        "note": "E3",
+        "valid": true,
+        "confidence": 85.4,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1338,
+        "frequency": 166.117,
+        "note": "E3",
+        "valid": true,
+        "confidence": 87.2,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1339,
+        "frequency": 166.078,
+        "note": "E3",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1340,
+        "frequency": 164.579,
+        "note": "E3",
+        "valid": true,
+        "confidence": 78.4,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1341,
+        "frequency": 164.542,
+        "note": "E3",
+        "valid": true,
+        "confidence": 89.7,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1342,
+        "frequency": 164.579,
+        "note": "E3",
+        "valid": true,
+        "confidence": 96.4,
+        "estimator": "F2_FALLBACK"
+      }
+    ]
+  },
+  {
+    "note": "C5",
+    "target_hz": 523.25,
+    "total_frames": 20,
+    "correct_frames": 14,
+    "correct_rate_pct": 70.0,
+    "no_signal_frames": 3,
+    "no_signal_rate_pct": 15.0,
+    "octave_errors_count": 3,
+    "mean_freq": 522.3849999999999,
+    "median_freq": 523.213,
+    "mae": 1.242428571428588,
+    "max_error": 2.7519999999999527,
+    "std_freq": 1.4176737484847737,
+    "frames": [
+      {
+        "frame": 1351,
+        "frequency": 523.376,
+        "note": "C5",
+        "valid": true,
+        "confidence": 75.7,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1352,
+        "frequency": 523.376,
+        "note": "C5",
+        "valid": true,
+        "confidence": 97.8,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1353,
+        "frequency": 260.424,
+        "note": "C4",
+        "valid": true,
+        "confidence": 74.6,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1354,
+        "frequency": 524.445,
+        "note": "C5",
+        "valid": true,
+        "confidence": 95.4,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1355,
+        "frequency": 524.445,
+        "note": "C5",
+        "valid": true,
+        "confidence": 78.3,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1356,
+        "frequency": 262.241,
+        "note": "C4",
+        "valid": true,
+        "confidence": 72.3,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1357,
+        "frequency": 520.938,
+        "note": "C5",
+        "valid": true,
+        "confidence": 73.3,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1358,
+        "frequency": 520.938,
+        "note": "C5",
+        "valid": true,
+        "confidence": 73.3,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1359,
+        "frequency": 520.938,
+        "note": "C5",
+        "valid": true,
+        "confidence": 73.6,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1360,
+        "frequency": 520.678,
+        "note": "C5",
+        "valid": true,
+        "confidence": 71.5,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1361,
+        "frequency": 520.498,
+        "note": "C5",
+        "valid": true,
+        "confidence": 73.1,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1362,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1363,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1364,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1365,
+        "frequency": 523.213,
+        "note": "C5",
+        "valid": true,
+        "confidence": 86.9,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1366,
+        "frequency": 523.213,
+        "note": "C5",
+        "valid": true,
+        "confidence": 75.8,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1367,
+        "frequency": 259.786,
+        "note": "C4",
+        "valid": true,
+        "confidence": 80.4,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1368,
+        "frequency": 523.213,
+        "note": "C5",
+        "valid": true,
+        "confidence": 100.0,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1369,
+        "frequency": 523.213,
+        "note": "C5",
+        "valid": true,
+        "confidence": 80.7,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1370,
+        "frequency": 520.906,
+        "note": "C5",
+        "valid": true,
+        "confidence": 79.0,
+        "estimator": "F1_PRIMARY"
+      }
+    ]
+  },
+  {
+    "note": "E2",
+    "target_hz": 82.41,
+    "total_frames": 20,
+    "correct_frames": 3,
+    "correct_rate_pct": 15.0,
+    "no_signal_frames": 8,
+    "no_signal_rate_pct": 40.0,
+    "octave_errors_count": 2,
+    "mean_freq": 83.16000000000001,
+    "median_freq": 83.063,
+    "mae": 0.7500000000000048,
+    "max_error": 0.9440000000000026,
+    "std_freq": 0.1371787155501887,
+    "frames": [
+      {
+        "frame": 1375,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1376,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1377,
+        "frequency": 248.922,
+        "note": "B3",
+        "valid": true,
+        "confidence": 69.4,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1378,
+        "frequency": 125.2,
+        "note": "B2",
+        "valid": true,
+        "confidence": 73.5,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1379,
+        "frequency": 249.001,
+        "note": "B3",
+        "valid": true,
+        "confidence": 80.1,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1380,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 72.0,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1381,
+        "frequency": 166.842,
+        "note": "E3",
+        "valid": true,
+        "confidence": 78.3,
+        "estimator": "F3_FALLBACK"
+      },
+      {
+        "frame": 1382,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 0.0,
+        "estimator": "F3_FALLBACK"
+      },
+      {
+        "frame": 1383,
+        "frequency": 83.063,
+        "note": "E2",
+        "valid": true,
+        "confidence": 64.9,
+        "estimator": "F3_FALLBACK"
+      },
+      {
+        "frame": 1384,
+        "frequency": 250.307,
+        "note": "B3",
+        "valid": true,
+        "confidence": 90.7,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1385,
+        "frequency": 250.307,
+        "note": "B3",
+        "valid": true,
+        "confidence": 63.8,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1386,
+        "frequency": 247.408,
+        "note": "B3",
+        "valid": true,
+        "confidence": 83.1,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1387,
+        "frequency": 83.063,
+        "note": "E2",
+        "valid": true,
+        "confidence": 74.3,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1388,
+        "frequency": 165.732,
+        "note": "E3",
+        "valid": true,
+        "confidence": 73.3,
+        "estimator": "F2_FALLBACK"
+      },
+      {
+        "frame": 1389,
+        "frequency": 83.354,
+        "note": "E2",
+        "valid": true,
+        "confidence": 66.5,
+        "estimator": "F3_FALLBACK"
+      },
+      {
+        "frame": 1390,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 75.3,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1391,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 60.0,
+        "estimator": "INVALID"
+      },
+      {
+        "frame": 1392,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 37.5,
+        "estimator": "F1_PRIMARY"
+      },
+      {
+        "frame": 1393,
+        "frequency": 0.0,
+        "note": "N/A",
+        "valid": false,
+        "confidence": 38.2,
+        "estimator": "F3_FALLBACK"
+      },
+      {
+        "frame": 1394,
+        "frequency": 59.606,
+        "note": "A#1",
+        "valid": true,
+        "confidence": 77.2,
+        "estimator": "F3_FALLBACK"
+      }
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+Created At: 2026-10-06T10:33:55+07:00
+Completed At: 2026-10-06T10:33:56+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/main.c`
+Total Lines: 1621
+Total Bytes: 73010
+Showing lines 990 to 1010
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+990:                     state = PITCH_VALID_PITCH;
+991:                 } else if (best_h_count >= 2 && cand_peak_mag >= 9.0f) {
+992:                     state = PITCH_WEAK_SIGNAL;
+993:                 } else {
+994:                     state = PITCH_NO_SIGNAL;
+995:                 }
+996:             } else if (best_hyp_freq < 110.0f) {
+997:                 // Dải nốt trầm piano [55 Hz .. 110 Hz) (C2, D2, E2, F2):
+998:                 // Cho phép fundamental yếu khi có ít nhất 2 họa âm thực sự được xác thực
+999:                 // Không bắt buộc fundamental là đỉnh mạnh nhất
+1000:                 if (best_h_count >= 2 && (cand_peak_mag >= 2.0f || sel_prominence >= 2.0f || primary_cand->mag >= 4.0f)) {
+1001:                     state = PITCH_VALID_PITCH;
+1002:                 } else if (best_h_count >= 2 || cand_peak_mag >= 1.5f) {
+1003:                     state = PITCH_WEAK_SIGNAL;
+1004:                 } else {
+1005:                     state = PITCH_NO_SIGNAL;
+1006:                 }
+1007:             } else {
+1008:                 // Tần số >= 110 Hz (bao gồm C4, A4, C5):
+1009:                 // Được xác thực VALID_PITCH khi điểm nhất quán họa âm cao hoặc độ nổi bật phổ tốt
+1010:                 if ((best_hyp_score >= 120.0f) ||
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

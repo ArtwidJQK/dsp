@@ -1,0 +1,134 @@
+{
+  "silence": {
+    "total": 13,
+    "false_positives": 2,
+    "fp_rate_pct": 15.384615384615385
+  },
+  "notes": [
+    {
+      "note": "A4",
+      "target_hz": 440.0,
+      "total_frames": 21,
+      "correct_frames": 3,
+      "correct_rate_pct": 14.285714285714285,
+      "no_signal_frames": 17,
+      "no_signal_rate_pct": 80.95238095238095,
+      "octave_errors": 0,
+      "mean_freq": 442.31500000000005,
+      "mae": 2.315000000000017,
+      "max_error": 2.9750000000000227,
+      "all_detected_notes": [
+        "F#3",
+        "N/A",
+        "A4"
+      ]
+    },
+    {
+      "note": "C4",
+      "target_hz": 261.626,
+      "total_frames": 20,
+      "correct_frames": 4,
+      "correct_rate_pct": 20.0,
+      "no_signal_frames": 13,
+      "no_signal_rate_pct": 65.0,
+      "octave_errors": 0,
+      "mean_freq": 257.85875000000004,
+      "mae": 3.767249999999976,
+      "max_error": 4.75,
+      "all_detected_notes": [
+        "D3",
+        "N/A",
+        "C4"
+      ]
+    },
+    {
+      "note": "E3",
+      "target_hz": 164.814,
+      "total_frames": 21,
+      "correct_frames": 1,
+      "correct_rate_pct": 4.761904761904762,
+      "no_signal_frames": 18,
+      "no_signal_rate_pct": 85.71428571428571,
+      "octave_errors": 0,
+      "mean_freq": 165.14,
+      "mae": 0.3259999999999934,
+      "max_error": 0.3259999999999934,
+      "all_detected_notes": [
+        "D3",
+        "F3",
+        "N/A",
+        "E3"
+      ]
+    },
+    {
+      "note": "D3",
+      "target_hz": 146.832,
+      "total_frames": 20,
+      "correct_frames": 4,
+      "correct_rate_pct": 20.0,
+      "no_signal_frames": 16,
+      "no_signal_rate_pct": 80.0,
+      "octave_errors": 0,
+      "mean_freq": 148.53875,
+      "mae": 1.7067500000000138,
+      "max_error": 2.26400000000001,
+      "all_detected_notes": [
+        "D3",
+        "N/A"
+      ]
+    },
+    {
+      "note": "C5",
+      "target_hz": 523.251,
+      "total_frames": 20,
+      "correct_frames": 3,
+      "correct_rate_pct": 15.0,
+      "no_signal_frames": 16,
+      "no_signal_rate_pct": 80.0,
+      "octave_errors": 1,
+      "mean_freq": 524.0333333333334,
+      "mae": 0.7823333333333645,
+      "max_error": 1.1200000000000045,
+      "all_detected_notes": [
+        "N/A",
+        "C5",
+        "C4"
+      ]
+    },
+    {
+      "note": "E2",
+      "target_hz": 82.407,
+      "total_frames": 23,
+      "correct_frames": 0,
+      "correct_rate_pct": 0.0,
+      "no_signal_frames": 20,
+      "no_signal_rate_pct": 86.95652173913044,
+      "octave_errors": 0,
+      "mean_freq": 0.0,
+      "mae": 0.0,
+      "max_error": 0.0,
+      "all_detected_notes": [
+        "G#3",
+        "N/A",
+        "B2"
+      ]
+    },
+    {
+      "note": "C2",
+      "target_hz": 65.406,
+      "total_frames": 22,
+      "correct_frames": 0,
+      "correct_rate_pct": 0.0,
+      "no_signal_frames": 21,
+      "no_signal_rate_pct": 95.45454545454545,
+      "octave_errors": 0,
+      "mean_freq": 0.0,
+      "mae": 0.0,
+      "max_error": 0.0,
+      "all_detected_notes": [
+        "C#5",
+        "N/A"
+      ]
+    }
+  ]
+}

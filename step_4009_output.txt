@@ -1,0 +1,44 @@
+Created At: 2026-10-06T10:33:34+07:00
+Completed At: 2026-10-06T10:33:34+07:00
+File Path: `file:///d:/X%E1%BB%AD%20l%C3%BD%20t%C3%ADn%20hi%E1%BB%87u%20s%E1%BB%91/main/main.c`
+Total Lines: 1621
+Total Bytes: 73010
+Showing lines 970 to 1005
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+970:             }
+971:         }
+972: 
+973:         // 8. Cổng phân loại trạng thái (Signal Gate & Confidence)
+974:         int hyp_target_bin = (int)roundf(best_hyp_freq / BIN_RESOLUTION_HZ);
+975:         if (hyp_target_bin < 1) hyp_target_bin = 1;
+976:         if (hyp_target_bin >= num_bins - 1) hyp_target_bin = num_bins - 2;
+977: 
+978:         float sel_local_floor = calculate_local_noise_floor(s_magnitude, hyp_target_bin, num_bins);
+979:         float sel_mag = s_magnitude[hyp_target_bin];
+980:         float sel_prominence = sel_mag / (sel_local_floor > 0.05f ? sel_local_floor : 0.05f);
+981:         float sel_snr_db = 20.0f * log10f(sel_prominence > 0.1f ? sel_prominence : 0.1f);
+982: 
+983:         pitch_state_t state = PITCH_NO_SIGNAL;
+984:         bool pass_energy_gate = (raw_ac_rms_norm >= MIN_AC_RMS_NORM);
+985: 
+986:         if (pass_energy_gate && best_hyp_score >= 20.0f) {
+987:             if (best_hyp_freq < 55.0f) {
+988:                 // Dưới 55 Hz: Bảo vệ nghiêm ngặt chống nhiễu điện lưới 50Hz và tiếng búa gõ 30-50Hz
+989:                 if (best_h_count >= 3 && cand_peak_mag >= 14.0f) {
+990:                     state = PITCH_VALID_PITCH;
+991:                 } else if (best_h_count >= 2 && cand_peak_mag >= 9.0f) {
+992:                     state = PITCH_WEAK_SIGNAL;
+993:                 } else {
+994:                     state = PITCH_NO_SIGNAL;
+995:                 }
+996:             } else if (best_hyp_freq < 110.0f) {
+997:                 // Dải nốt trầm piano [55 Hz .. 110 Hz) (C2, D2, E2, F2):
+998:                 // Cho phép fundamental yếu khi có ít nhất 2 họa âm thực sự được xác thực
+999:                 // Không bắt buộc fundamental là đỉnh mạnh nhất
+1000:                 if (best_h_count >= 2 && (cand_peak_mag >= 2.0f || sel_prominence >= 2.0f || primary_cand->mag >= 4.0f)) {
+1001:                     state = PITCH_VALID_PITCH;
+1002:                 } else if (best_h_count >= 2 || cand_peak_mag >= 1.5f) {
+1003:                     state = PITCH_WEAK_SIGNAL;
+1004:                 } else {
+1005:                     state = PITCH_NO_SIGNAL;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
